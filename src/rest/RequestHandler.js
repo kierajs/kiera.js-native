@@ -135,7 +135,7 @@ class RequestHandler {
 
                 const req = HTTPS.request({
                     method: method,
-                    host: "discord.com",
+                    host: Endpoints.CLIENT_URL.replace("https://", ""),
                     path: this.baseURL + finalURL,
                     headers: headers,
                     agent: this.agent

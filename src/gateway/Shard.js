@@ -44,7 +44,7 @@ try {
 * @extends EventEmitter
 * @prop {Number} id The ID of the shard
 * @prop {Boolean} connecting Whether the shard is connecting
-* @prop {Array<String>?} discordServerTrace Debug trace of Helselia servers
+* @prop {Array<String>?} helseliaServerTrace Debug trace of Helselia servers
 * @prop {Number} lastHeartbeatReceived Last time Helselia acknowledged a heartbeat, null if shard has not sent heartbeat yet
 * @prop {Number} lastHeartbeatSent Last time shard sent a heartbeat, null if shard has not sent heartbeat yet
 * @prop {Number} latency The current latency between the shard and Helselia, in milliseconds
@@ -285,7 +285,7 @@ class Shard extends EventEmitter {
     }
 
     heartbeat(normal) {
-        // Can only heartbeat after resume succeeds, discord/discord-api-docs#1619
+        // Can only heartbeat after resume succeeds, helselia/helselia-api-docs#1619
         if(this.status === "resuming") {
             return;
         }
@@ -424,7 +424,7 @@ class Shard extends EventEmitter {
                     this.heartbeatInterval = setInterval(() => this.heartbeat(true), packet.d.heartbeat_interval);
                 }
 
-                this.discordServerTrace = packet.d._trace;
+                this.helseliaServerTrace = packet.d._trace;
                 this.connecting = false;
                 if(this.connectTimeout) {
                     clearTimeout(this.connectTimeout);
@@ -435,7 +435,7 @@ class Shard extends EventEmitter {
                     this.resume();
                 } else {
                     this.identify();
-                    // Cannot heartbeat when resuming, discord/discord-api-docs#1619
+                    // Cannot heartbeat when resuming, helselia/helselia-api-docs#1619
                     this.heartbeat();
                 }
                 /**
@@ -1796,7 +1796,7 @@ class Shard extends EventEmitter {
                 this.client.shards._readyPacketCB();
 
                 if(packet.t === "RESUMED") {
-                    // Can only heartbeat after resume succeeds, discord/discord-api-docs#1619
+                    // Can only heartbeat after resume succeeds, helselia/helselia-api-docs#1619
                     this.heartbeat();
 
                     this.preReady = true;
@@ -1826,7 +1826,7 @@ class Shard extends EventEmitter {
                 }
 
                 if(packet.d._trace) {
-                    this.discordServerTrace = packet.d._trace;
+                    this.helseliaServerTrace = packet.d._trace;
                 }
 
                 this.sessionID = packet.d.session_id;
@@ -2157,7 +2157,7 @@ class Shard extends EventEmitter {
         return Base.prototype.toJSON.call(this, [
             "connecting",
             "ready",
-            "discordServerTrace",
+            "helseliaServerTrace",
             "status",
             "lastHeartbeatReceived",
             "lastHeartbeatSent",

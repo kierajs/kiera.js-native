@@ -1,9 +1,7 @@
 "use strict";
 
-const {REST_VERSION} = require("../Constants");
-
-module.exports.BASE_URL = "/api/v" + REST_VERSION;
-module.exports.CDN_URL = "https://constanze.live";
+module.exports.BASE_URL = "/api/v1";
+module.exports.CDN_URL = "https://cdn.constanze.live";
 module.exports.CLIENT_URL = "https://constanze.live";
 
 module.exports.CHANNEL =                                                (chanID) => `/channels/${chanID}`;

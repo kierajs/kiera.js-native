@@ -2109,7 +2109,7 @@ declare namespace Eris {
   export class Shard extends EventEmitter implements SimpleJSON {
     client: Client;
     connecting: boolean;
-    discordServerTrace?: string[];
+    helseliaServerTrace?: string[];
     id: number;
     lastHeartbeatReceived: number;
     lastHeartbeatSent: number;

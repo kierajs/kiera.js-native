@@ -467,7 +467,7 @@ class Club extends Base {
 
     /**
     * Modify a club's widget
-    * @arg {Object} options The widget object to modify (https://discord.com/developers/docs/resources/club#modify-club-widget)
+    * @arg {Object} options The widget object to modify (https://helselia.com/developers/docs/resources/club#modify-club-widget)
     * @returns {Promise<Object>} A club widget object
     */
     editWidget(options) {

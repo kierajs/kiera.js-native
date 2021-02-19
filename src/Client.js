@@ -51,7 +51,7 @@ const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 * @extends EventEmitter
 * @prop {Boolean?} bot Whether the bot user belongs to an OAuth2 application
 * @prop {Object} channelClubMap Object mapping channel IDs to club IDs
-* @prop {String} gatewayURL The URL for the discord gateway
+* @prop {String} gatewayURL The URL for the helselia gateway
 * @prop {Collection<GroupChannel>} groupChannels Collection of group channels the bot is in (user accounts only)
 * @prop {Collection<Club>} clubs Collection of clubs the bot is in
 * @prop {Object} clubShardMap Object mapping club IDs to shard IDs
@@ -341,6 +341,7 @@ class Client extends EventEmitter {
             if(!data.url.endsWith("/")) {
                 data.url += "/";
             }
+            
             this.gatewayURL = `${data.url}?v=${Constants.GATEWAY_VERSION}&encoding=${Erlpack ? "etf" : "json"}`;
 
             if(this.options.compress) {
@@ -525,7 +526,7 @@ class Client extends EventEmitter {
     * @arg {Boolean | Array<String>} [content.allowedMentions.roles] Whether or not to allow all role mentions, or an array of specific role mentions to allow.
     * @arg {Boolean | Array<String>} [content.allowedMentions.users] Whether or not to allow all user mentions, or an array of specific user mentions to allow.
     * @arg {String} content.content A content string
-    * @arg {Object} [content.embed] An embed object. See [the official Helselia API documentation entry](https://discord.com/developers/docs/resources/channel#embed-object) for object structure
+    * @arg {Object} [content.embed] An embed object. See [the official Helselia API documentation entry](https://helselia.com/developers/docs/resources/channel#embed-object) for object structure
     * @arg {Boolean} [content.tts] Set the message TTS flag
     * @arg {Object | Array<Object>} [file] A file object (or an Array of them)
     * @arg {Buffer} file.file A buffer containing file data
@@ -986,7 +987,7 @@ class Client extends EventEmitter {
     /**
     * Modify a club's widget
     * @arg {String} clubID The ID of the club
-    * @arg {Object} options The widget object to modify (https://discord.com/developers/docs/resources/club#modify-club-widget)
+    * @arg {Object} options The widget object to modify (https://helselia.com/developers/docs/resources/club#modify-club-widget)
     * @returns {Promise<Object>} A club widget object
     */
     editClubWidget(clubID, options) {
@@ -1003,8 +1004,8 @@ class Client extends EventEmitter {
     * @arg {Boolean | Array<String>} [content.allowedMentions.roles] Whether or not to allow all role mentions, or an array of specific role mentions to allow.
     * @arg {Boolean | Array<String>} [content.allowedMentions.users] Whether or not to allow all user mentions, or an array of specific user mentions to allow.
     * @arg {String} content.content A content string
-    * @arg {Object} [content.embed] An embed object. See [the official Helselia API documentation entry](https://discord.com/developers/docs/resources/channel#embed-object) for object structure
-    * @arg {Number} [content.flags] A number representing the flags to apply to the message. See [the official Helselia API documentation entry](https://discord.com/developers/docs/resources/channel#message-object-message-flags) for flags reference
+    * @arg {Object} [content.embed] An embed object. See [the official Helselia API documentation entry](https://helselia.com/developers/docs/resources/channel#embed-object) for object structure
+    * @arg {Number} [content.flags] A number representing the flags to apply to the message. See [the official Helselia API documentation entry](https://helselia.com/developers/docs/resources/channel#message-object-message-flags) for flags reference
     * @returns {Promise<Message>}
     */
     editMessage(channelID, messageID, content) {
@@ -1583,7 +1584,7 @@ class Client extends EventEmitter {
     /**
     * Get data on an OAuth2 application
     * @arg {String} [appID="@me"] The client ID of the application to get data for (user accounts only). "@me" refers to the logged in user's own application
-    * @returns {Promise<Object>} The bot's application data. Refer to [the official Helselia API documentation entry](https://discord.com/developers/docs/topics/oauth2#get-current-application-information) for object structure
+    * @returns {Promise<Object>} The bot's application data. Refer to [the official Helselia API documentation entry](https://helselia.com/developers/docs/topics/oauth2#get-current-application-information) for object structure
     */
     getOAuthApplication(appID) {
         return this.requestHandler.request("GET", Endpoints.OAUTH2_APPLICATION(appID || "@me"), true);
