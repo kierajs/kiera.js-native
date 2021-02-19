@@ -1,6 +1,6 @@
-const Eris = require("eris");
+const Kiera = require("kiera.js");
 
-const bot = new Eris("BOT_TOKEN");
+const bot = new Kiera("BOT_TOKEN");
 // Replace BOT_TOKEN with your bot account's token
 const playCommand = "!play";
 
@@ -14,7 +14,7 @@ bot.on("messageCreate", (msg) => { // When a message is created
             bot.createMessage(msg.channel.id, "Please specify a filename.");
             return;
         }
-        if(!msg.channel.guild) { // Check if the message was sent in a guild
+        if(!msg.channel.club) { // Check if the message was sent in a club
             bot.createMessage(msg.channel.id, "This command can only be run in a server.");
             return;
         }
@@ -39,4 +39,4 @@ bot.on("messageCreate", (msg) => { // When a message is created
     }
 });
 
-bot.connect(); // Get the bot to connect to Discord
+bot.connect(); // Get the bot to connect to Helselia

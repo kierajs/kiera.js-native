@@ -1,4 +1,4 @@
-const Eris = require("eris");
+const kiera = require("kiera.js");
 
 const bot = new Eris("BOT_TOKEN");
 // Replace BOT_TOKEN with your bot account's token
@@ -17,4 +17,4 @@ bot.on("messageCreate", (msg) => { // When a message is created
     }
 });
 
-bot.connect(); // Get the bot to connect to Discord
+bot.connect(); // Get the bot to connect to Helselia

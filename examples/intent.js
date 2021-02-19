@@ -1,20 +1,20 @@
-const Eris = require("eris");
+const Kiera = require("kiera.js");
 
 const clientOptions = {
     intents: [
-        "guilds",
-        "guildMessages"
+        "clubs",
+        "clubMessages"
     ]
 };
-const bot = new Eris("BOT_TOKEN", clientOptions);
+const bot = new Kiera("BOT_TOKEN", clientOptions);
 // Replace BOT_TOKEN with your bot account's token
 
 bot.on("ready", () => { // When the bot is ready
     console.log("Ready!"); // Log "Ready!"
 });
 
-bot.on("guildCreate", (guild) => { // When the client joins a new guild
-    console.log(`New guild: ${guild.name}`);
+bot.on("clubCreate", (club) => { // When the client joins a new club
+    console.log(`New club: ${club.name}`);
 });
 
 bot.on("messageCreate", (msg) => { // When a message is created
@@ -22,9 +22,9 @@ bot.on("messageCreate", (msg) => { // When a message is created
 });
 
 // This event will never fire since the client did
-// not specify `guildMessageTyping` intent
+// not specify `clubMessageTyping` intent
 bot.on("typingStart", (channel, user) => { // When a user starts typing
     console.log(`${user.username} is typing in ${channel.name}`);
 });
 
-bot.connect(); // Get the bot to connect to Discord
+bot.connect(); // Get the bot to connect to Helselia

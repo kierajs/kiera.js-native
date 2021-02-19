@@ -1,7 +1,7 @@
 {
-  "name": "eris",
-  "version": "0.14.0",
-  "description": "A NodeJS Discord library",
+  "name": "@kierajs/kiera.js",
+  "version": "1.0.0",
+  "description": "**Developer's Note:** This is just a prototype. Yes, I used [abalabahaha/eris](https://github.com/abalabahaha/eris) for most, if not all, of this code - albeit modified for Helselia but it still deserves credit.",
   "main": "./index.js",
   "exports": {
     ".": [
@@ -16,7 +16,7 @@
   },
   "typings": "./index.d.ts",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=10.4.0"
   },
   "scripts": {
     "lint:js": "eslint -c .eslintrc.yml lib examples *.js",
@@ -26,21 +26,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abalabahaha/eris.git"
+    "url": "git+https://github.com/helselia/kierapriv.js.git"
   },
   "keywords": [
     "api",
-    "discord",
-    "discordapp",
-    "eris",
+    "helselia",
     "wrapper"
   ],
-  "author": "abalabahaha",
+  "author": "Constanze",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/abalabahaha/eris/issues"
-  },
-  "homepage": "https://abal.moe/Eris/",
   "dependencies": {
     "ws": "^7.2.1"
   },
@@ -65,5 +59,12 @@
     "tls": false,
     "tweetnacl": false,
     "ws": false
+  },
+  "bugs": {
+    "url": "https://github.com/helselia/kierapriv.js/issues"
+  },
+  "homepage": "https://github.com/helselia/kierapriv.js#readme",
+  "directories": {
+    "example": "examples"
   }
 }

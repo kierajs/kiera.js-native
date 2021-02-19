@@ -1,8 +1,8 @@
-const Eris = require("eris");
+const Kiera = require("kiera.js");
 
 // Replace BOT_TOKEN with your bot account's token
-const bot = new Eris.CommandClient("BOT_TOKEN", {}, {
-    description: "A test bot made with Eris",
+const bot = new Kiera.CommandClient("BOT_TOKEN", {}, {
+    description: "A test bot made with Kiera",
     owner: "somebody",
     prefix: "!"
 });

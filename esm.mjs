@@ -1,7 +1,7 @@
-import Eris from "./index.js";
+import Kiera from "./index.js";
 
 export default function(token, options) {
-  return new Eris.Client(token, options);
+  return new Kiera.Client(token, options);
 }
 
 export const {
@@ -15,8 +15,8 @@ export const {
   Command,
   CommandClient,
   Constants,
-  DiscordHTTPError,
-  DiscordRESTError,
+  HelseliaHTTPError,
+  HelseliaRESTError,
   ExtendedUser,
   GroupChannel,
   Guild,
@@ -45,4 +45,4 @@ export const {
   VoiceConnection,
   VoiceConnectionManager,
   VoiceState
-} = Eris;
+} = Kiera;
