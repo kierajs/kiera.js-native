@@ -4,7 +4,6 @@ module.exports.ImageFormats = [
     "jpg",
     "jpeg",
     "png",
-    "webp",
     "gif"
 ];
 
@@ -31,7 +30,7 @@ module.exports.GatewayOPCodes = {
 };
 
 module.exports.GATEWAY_VERSION = 6;
-module.exports.REST_VERSION = 7;
+module.exports.REST_VERSION = 1;
 
 module.exports.Permissions = {
     createInstantInvite:  1,
