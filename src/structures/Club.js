@@ -4,7 +4,7 @@ const Base = require("./Base");
 const Channel = require("./Channel");
 const Endpoints = require("../rest/Endpoints");
 const Collection = require("../util/Collection");
-const GuildChannel = require("./ClubChannel");
+const ClubChannel = require("./ClubChannel");
 const Member = require("./Member");
 const Role = require("./Role");
 const VoiceState = require("./VoiceState");
@@ -19,7 +19,7 @@ const {Permissions} = require("../Constants");
 * @prop {Number?} approximatePresenceCount The approximate number of presences in the club (REST only)
 * @prop {String?} banner The hash of the club banner image, or null if no banner (VIP only)
 * @prop {String?} bannerURL The URL of the club's banner image
-* @prop {Collection<GuildChannel>} channels Collection of Channels in the club
+* @prop {Collection<ClubChannel>} channels Collection of Channels in the club
 * @prop {Number} createdAt Timestamp of the club's creation
 * @prop {Number} defaultNotifications The default notification settings for the club. 0 is "All Messages", 1 is "Only @mentions"
 * @prop {String?} description The description for the club (VIP only)
@@ -57,7 +57,7 @@ const {Permissions} = require("../Constants");
 * @prop {Number?} widgetChannelID The channel id that the widget will generate an invite to. REST only.
 * @prop {Boolean?} widgetEnabled Whether the club widget is enabled. REST only.
 */
-class Guild extends Base {
+class Club extends Base {
     constructor(data, client) {
         super(data.id);
         this._client = client;
@@ -65,7 +65,7 @@ class Guild extends Base {
         this.unavailable = !!data.unavailable;
         this.joinedAt = Date.parse(data.joined_at);
         this.voiceStates = new Collection(VoiceState);
-        this.channels = new Collection(GuildChannel);
+        this.channels = new Collection(ClubChannel);
         this.members = new Collection(Member);
         this.memberCount = data.member_count;
         this.roles = new Collection(Role);
@@ -96,7 +96,7 @@ class Guild extends Base {
                 const channel = Channel.from(channelData, client);
                 channel.club = this;
                 this.channels.add(channel, client);
-                client.channelGuildMap[channel.id] = this.id;
+                client.channelClubMap[channel.id] = this.id;
             }
         }
 
@@ -247,7 +247,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     addMemberRole(memberID, roleID, reason) {
-        return this._client.addGuildMemberRole.call(this._client, this.id, memberID, roleID, reason);
+        return this._client.addClubMemberRole.call(this._client, this.id, memberID, roleID, reason);
     }
 
     /**
@@ -258,7 +258,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     banMember(userID, deleteMessageDays, reason) {
-        return this._client.banGuildMember.call(this._client, this.id, userID, deleteMessageDays, reason);
+        return this._client.banClubMember.call(this._client, this.id, userID, deleteMessageDays, reason);
     }
 
     /**
@@ -290,7 +290,7 @@ class Guild extends Base {
     * @returns {Promise<Object>} A club emoji object
     */
     createEmoji(options, reason) {
-        return this._client.createGuildEmoji.call(this._client, this.id, options, reason);
+        return this._client.createClubEmoji.call(this._client, this.id, options, reason);
     }
 
     /**
@@ -313,7 +313,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     delete() {
-        return this._client.deleteGuild.call(this._client, this.id);
+        return this._client.deleteClub.call(this._client, this.id);
     }
 
     /**
@@ -323,7 +323,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     deleteEmoji(emojiID, reason) {
-        return this._client.deleteGuildEmoji.call(this._client, this.id, emojiID, reason);
+        return this._client.deleteClubEmoji.call(this._client, this.id, emojiID, reason);
     }
 
     /**
@@ -332,7 +332,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     deleteIntegration(integrationID) {
-        return this._client.deleteGuildIntegration.call(this._client, this.id, integrationID);
+        return this._client.deleteClubIntegration.call(this._client, this.id, integrationID);
     }
 
     /**
@@ -392,10 +392,10 @@ class Guild extends Base {
     * @arg {String} [options.systemChannelID] The ID of the system channel
     * @arg {Number} [options.verificationLevel] The club verification level
     * @arg {String} [reason] The reason to be displayed in audit logs
-    * @returns {Promise<Guild>}
+    * @returns {Promise<Club>}
     */
     edit(options, reason) {
-        return this._client.editGuild.call(this._client, this.id, options, reason);
+        return this._client.editClub.call(this._client, this.id, options, reason);
     }
 
     /**
@@ -408,7 +408,7 @@ class Guild extends Base {
     * @returns {Promise<Object>} A club emoji object
     */
     editEmoji(emojiID, options, reason) {
-        return this._client.editGuildEmoji.call(this._client, this.id, emojiID, options, reason);
+        return this._client.editClubEmoji.call(this._client, this.id, emojiID, options, reason);
     }
 
     /**
@@ -421,7 +421,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     editIntegration(integrationID, options) {
-        return this._client.editGuildIntegration.call(this._client, this.id, integrationID, options);
+        return this._client.editClubIntegration.call(this._client, this.id, integrationID, options);
     }
 
     /**
@@ -437,7 +437,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     editMember(memberID, options, reason) {
-        return this._client.editGuildMember.call(this._client, this.id, memberID, options, reason);
+        return this._client.editClubMember.call(this._client, this.id, memberID, options, reason);
     }
 
     /**
@@ -471,7 +471,7 @@ class Guild extends Base {
     * @returns {Promise<Object>} A club widget object
     */
     editWidget(options) {
-        return this._client.getGuildWidget.call(this._client, this.id, options);
+        return this._client.getClubWidget.call(this._client, this.id, options);
     }
 
     /**
@@ -496,7 +496,7 @@ class Guild extends Base {
     * @returns {Promise<Array<Member>>} Resolves with the fetched members.
     */
     fetchMembers(options) {
-        return this.shard.requestGuildMembers(this.id, options);
+        return this.shard.requestClubMembers(this.id, options);
     }
 
     /**
@@ -507,7 +507,7 @@ class Guild extends Base {
     * @returns {Promise<Object>} Resolves with an Object containing `users` and `audit_log_entries` keys
     */
     getAuditLogs(limit, before, actionType) {
-        return this._client.getGuildAuditLogs.call(this._client, this.id, limit, before, actionType);
+        return this._client.getClubAuditLogs.call(this._client, this.id, limit, before, actionType);
     }
 
     /**
@@ -516,7 +516,7 @@ class Guild extends Base {
     * @returns {Promise<Object>} Resolves with {reason: String, user: User}
     */
     getBan(userID) {
-        return this._client.getGuildBan.call(this._client, this.id, userID);
+        return this._client.getClubBan.call(this._client, this.id, userID);
     }
 
     /**
@@ -524,7 +524,7 @@ class Guild extends Base {
     * @returns {Promise<Array<Object>>} Resolves with an array of {reason: String, user: User}
     */
     getBans() {
-        return this._client.getGuildBans.call(this._client, this.id);
+        return this._client.getClubBans.call(this._client, this.id);
     }
 
     /**
@@ -532,15 +532,15 @@ class Guild extends Base {
     * @returns {Promise<Object>} A club embed object
     */
     getEmbed() {
-        return this._client.getGuildEmbed.call(this._client, this.id);
+        return this._client.getClubEmbed.call(this._client, this.id);
     }
 
     /**
     * Get a list of integrations for the club
-    * @returns {Promise<GuildIntegration[]>}
+    * @returns {Promise<ClubIntegration[]>}
     */
     getIntegrations() {
-        return this._client.getGuildIntegrations.call(this._client, this.id);
+        return this._client.getClubIntegrations.call(this._client, this.id);
     }
 
     /**
@@ -548,7 +548,7 @@ class Guild extends Base {
     * @returns {Promise<Array<Invite>>}
     */
     getInvites() {
-        return this._client.getGuildInvites.call(this._client, this.id);
+        return this._client.getClubInvites.call(this._client, this.id);
     }
 
     /**
@@ -567,7 +567,7 @@ class Guild extends Base {
     * @returns {Promise<(CategoryChannel[] | TextChannel[] | VoiceChannel[])>}
     */
     getRESTChannels() {
-        return this._client.getRESTGuildChannels.call(this._client, this.id);
+        return this._client.getRESTClubChannels.call(this._client, this.id);
     }
 
     /**
@@ -576,7 +576,7 @@ class Guild extends Base {
     * @returns {Promise<Object>} An emoji object
     */
     getRESTEmoji(emojiID) {
-        return this._client.getRESTGuildEmoji.call(this._client, this.id, emojiID);
+        return this._client.getRESTClubEmoji.call(this._client, this.id, emojiID);
     }
 
     /**
@@ -584,7 +584,7 @@ class Guild extends Base {
     * @returns {Promise<Array<Object>>} An array of club emoji objects
     */
     getRESTEmojis() {
-        return this._client.getRESTGuildEmojis.call(this._client, this.id);
+        return this._client.getRESTClubEmojis.call(this._client, this.id);
     }
 
     /**
@@ -593,7 +593,7 @@ class Guild extends Base {
     * @returns {Promise<Member>}
     */
     getRESTMember(memberID) {
-        return this._client.getRESTGuildMember.call(this._client, this.id, memberID);
+        return this._client.getRESTClubMember.call(this._client, this.id, memberID);
     }
 
     /**
@@ -603,7 +603,7 @@ class Guild extends Base {
     * @returns {Promise<Array<Member>>}
     */
     getRESTMembers(limit, after) {
-        return this._client.getRESTGuildMembers.call(this._client, this.id, limit, after);
+        return this._client.getRESTClubMembers.call(this._client, this.id, limit, after);
     }
 
     /**
@@ -611,7 +611,7 @@ class Guild extends Base {
     * @returns {Promise<Array<Role>>}
     */
     getRESTRoles() {
-        return this._client.getRESTGuildRoles.call(this._client, this.id);
+        return this._client.getRESTClubRoles.call(this._client, this.id);
     }
 
     /**
@@ -619,7 +619,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     getVanity() {
-        return this._client.getGuildVanity.call(this._client, this.id);
+        return this._client.getClubVanity.call(this._client, this.id);
     }
 
     /**
@@ -635,7 +635,7 @@ class Guild extends Base {
     * @returns {Promise<Array<Object>>} Resolves with an array of webhook objects
     */
     getWebhooks() {
-        return this._client.getGuildWebhooks.call(this._client, this.id);
+        return this._client.getClubWebhooks.call(this._client, this.id);
     }
 
     /**
@@ -643,7 +643,7 @@ class Guild extends Base {
     * @returns {Promise<Object>} A club widget object
     */
     getWidget() {
-        return this._client.getGuildWidget.call(this._client, this.id);
+        return this._client.getClubWidget.call(this._client, this.id);
     }
 
     /**
@@ -653,7 +653,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     kickMember(userID, reason) {
-        return this._client.kickGuildMember.call(this._client, this.id, userID, reason);
+        return this._client.kickClubMember.call(this._client, this.id, userID, reason);
     }
 
     /**
@@ -661,7 +661,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     leave() {
-        return this._client.leaveGuild.call(this._client, this.id);
+        return this._client.leaveClub.call(this._client, this.id);
     }
 
     /**
@@ -721,7 +721,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     removeMemberRole(memberID, roleID, reason) {
-        return this._client.removeGuildMemberRole.call(this._client, this.id, memberID, roleID, reason);
+        return this._client.removeClubMemberRole.call(this._client, this.id, memberID, roleID, reason);
     }
 
     /**
@@ -731,7 +731,7 @@ class Guild extends Base {
     * @returns {Promise<Array<Member>>}
     */
     searchMembers(query, limit) {
-        return this._client.searchGuildMembers.call(this._client, this.id, query, limit);
+        return this._client.searchClubMembers.call(this._client, this.id, query, limit);
     }
 
     /**
@@ -740,7 +740,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     syncIntegration(integrationID) {
-        return this._client.syncGuildIntegration.call(this._client, this.id, integrationID);
+        return this._client.syncClubIntegration.call(this._client, this.id, integrationID);
     }
 
     /**
@@ -750,7 +750,7 @@ class Guild extends Base {
     * @returns {Promise}
     */
     unbanMember(userID, reason) {
-        return this._client.unbanGuildMember.call(this._client, this.id, userID, reason);
+        return this._client.unbanClubMember.call(this._client, this.id, userID, reason);
     }
 
     toJSON(props = []) {
@@ -788,4 +788,4 @@ class Guild extends Base {
     }
 }
 
-module.exports = Guild;
+module.exports = Club;

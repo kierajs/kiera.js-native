@@ -10,7 +10,7 @@ const Permission = require("./Permission");
 * @prop {Boolean} hoist Whether users with this role are hoisted in the user list or not
 * @prop {String} id The ID of the role
 * @prop {Object} json Generates a JSON representation of the role permissions
-* @prop {Guild} club The club that owns the role
+* @prop {Club} club The club that owns the role
 * @prop {Boolean} managed Whether a club integration manages this role or not
 * @prop {String} mention A string that mentions the role
 * @prop {Boolean} mentionable Whether the role is mentionable or not

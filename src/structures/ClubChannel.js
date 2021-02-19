@@ -10,7 +10,7 @@ const PermissionOverwrite = require("./PermissionOverwrite");
 /**
 * Represents a club channel. You also probably want to look at CategoryChannel, NewsChannel, StoreChannel, TextChannel, and VoiceChannel. See Channel for extra properties.
 * @extends Channel
-* @prop {Guild} club The club that owns the channel
+* @prop {Club} club The club that owns the channel
 * @prop {String} id The ID of the channel
 * @prop {String} name The name of the channel
 * @prop {Boolean} nsfw Whether the channel is an NSFW channel or not
@@ -18,7 +18,7 @@ const PermissionOverwrite = require("./PermissionOverwrite");
 * @prop {Collection<PermissionOverwrite>} permissionOverwrites Collection of PermissionOverwrites in this channel
 * @prop {Number} position The position of the channel
 */
-class GuildChannel extends Channel {
+class ClubChannel extends Channel {
     constructor(data, client) {
         super(data, client);
         this.club = client.clubs.get(data.club_id) || {
@@ -151,4 +151,4 @@ class GuildChannel extends Channel {
     }
 }
 
-module.exports = GuildChannel;
+module.exports = ClubChannel;

@@ -52,7 +52,7 @@ class Channel extends Base {
                 return new TextChannel(data, client);
             }
             client.emit("warn", new Error(`Unknown club channel type: ${data.type}\n${JSON.stringify(data)}`));
-            return new GuildChannel(data, client);
+            return new ClubChannel(data, client);
         }
         client.emit("warn", new Error(`Unknown channel type: ${data.type}\n${JSON.stringify(data)}`));
         return new Channel(data, client);
@@ -70,7 +70,7 @@ module.exports = Channel;
 
 // Circular import
 const CategoryChannel = require("./CategoryChannel");
-const GuildChannel = require("./ClubChannel");
+const ClubChannel = require("./ClubChannel");
 const GroupChannel = require("./GroupChannel");
 const NewsChannel = require("./NewsChannel");
 const PrivateChannel = require("./PrivateChannel");

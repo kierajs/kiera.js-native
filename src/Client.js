@@ -7,10 +7,10 @@ const Constants = require("./Constants");
 const Endpoints = require("./rest/Endpoints");
 const ExtendedUser = require("./structures/ExtendedUser");
 const GroupChannel = require("./structures/GroupChannel");
-const Guild = require("./structures/Guild");
-const GuildAuditLogEntry = require("./structures/GuildAuditLogEntry");
-const GuildIntegration = require("./structures/GuildIntegration");
-const GuildPreview = require("./structures/GuildPreview");
+const Club = require("./structures/Club");
+const ClubAuditLogEntry = require("./structures/ClubAuditLogEntry");
+const ClubIntegration = require("./structures/ClubIntegration");
+const ClubPreview = require("./structures/ClubPreview");
 const Invite = require("./structures/Invite");
 const Member = require("./structures/Member");
 const Message = require("./structures/Message");
@@ -20,7 +20,7 @@ const Relationship = require("./structures/Relationship");
 const RequestHandler = require("./rest/RequestHandler");
 const Role = require("./structures/Role");
 const ShardManager = require("./gateway/ShardManager");
-const UnavailableGuild = require("./structures/UnavailableGuild");
+const UnavailableClub = require("./structures/UnavailableClub");
 const User = require("./structures/User");
 const VoiceConnectionManager = require("./voice/VoiceConnectionManager");
 
@@ -50,10 +50,10 @@ const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 * Represents the main Eris client
 * @extends EventEmitter
 * @prop {Boolean?} bot Whether the bot user belongs to an OAuth2 application
-* @prop {Object} channelGuildMap Object mapping channel IDs to club IDs
+* @prop {Object} channelClubMap Object mapping channel IDs to club IDs
 * @prop {String} gatewayURL The URL for the discord gateway
 * @prop {Collection<GroupChannel>} groupChannels Collection of group channels the bot is in (user accounts only)
-* @prop {Collection<Guild>} clubs Collection of clubs the bot is in
+* @prop {Collection<Club>} clubs Collection of clubs the bot is in
 * @prop {Object} clubShardMap Object mapping club IDs to shard IDs
 * @prop {Object} notes Object mapping user IDs to user notes (user accounts only)
 * @prop {Object} options Eris options
@@ -64,10 +64,10 @@ const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 * @prop {Collection<Shard>} shards Collection of shards Eris is using
 * @prop {Number} startTime Timestamp of bot ready event
 * @prop {String} token The bot user token
-* @prop {Collection<UnavailableGuild>} unavailableGuilds Collection of unavailable clubs the bot is in
+* @prop {Collection<UnavailableClub>} unavailableClubs Collection of unavailable clubs the bot is in
 * @prop {Number} uptime How long in milliseconds the bot has been up for
 * @prop {ExtendedUser} user The bot user
-* @prop {Object} userGuildSettings Object mapping club IDs to individual club settings for the bot user (user accounts only)
+* @prop {Object} userClubSettings Object mapping club IDs to individual club settings for the bot user (user accounts only)
 * @prop {Collection<User>} users Collection of users the bot sees
 * @prop {Object} userSettings Object containing the user account settings (user accounts only)
 * @prop {Collection<VoiceConnection>} voiceConnections Extended collection of active VoiceConnections the bot has
@@ -187,21 +187,21 @@ class Client extends EventEmitter {
         this.bot = this.options.restMode && token ? token.startsWith("Bot ") : true;
         this.startTime = 0;
         this.lastConnect = 0;
-        this.channelGuildMap = {};
+        this.channelClubMap = {};
         this.shards = new ShardManager(this);
         this.groupChannels = new Collection(GroupChannel);
-        this.clubs = new Collection(Guild);
+        this.clubs = new Collection(Club);
         this.privateChannelMap = {};
         this.privateChannels = new Collection(PrivateChannel);
         this.clubShardMap = {};
-        this.unavailableGuilds = new Collection(UnavailableGuild);
+        this.unavailableClubs = new Collection(UnavailableClub);
         this.relationships = new Collection(Relationship);
         this.users = new Collection(User);
         this.presence = {
             game: null,
             status: "offline"
         };
-        this.userGuildSettings = [];
+        this.userClubSettings = [];
         this.userSettings = {};
         this.notes = {};
         this.voiceConnections = new VoiceConnectionManager();
@@ -242,7 +242,7 @@ class Client extends EventEmitter {
     * @arg {String} [reason] The reason to be displayed in audit logs
     * @returns {Promise}
     */
-    addGuildMemberRole(clubID, memberID, roleID, reason) {
+    addClubMemberRole(clubID, memberID, roleID, reason) {
         return this.requestHandler.request("PUT", Endpoints.CLUB_MEMBER_ROLE(clubID, memberID, roleID), true, {
             reason
         });
@@ -301,7 +301,7 @@ class Client extends EventEmitter {
     * @arg {String} [reason] The reason to be displayed in audit logs
     * @returns {Promise}
     */
-    banGuildMember(clubID, userID, deleteMessageDays, reason) {
+    banClubMember(clubID, userID, deleteMessageDays, reason) {
         if(!isNaN(deleteMessageDays) && (deleteMessageDays < 0 || deleteMessageDays > 7)) {
             return Promise.reject(new Error(`Invalid deleteMessageDays value (${deleteMessageDays}), should be a number between 0-7 inclusive`));
         }
@@ -478,9 +478,9 @@ class Client extends EventEmitter {
     * @arg {Array<Object>} [options.roles] The new roles of the club, the first one is the @everyone role. IDs are placeholders which allow channel overwrites.
     * @arg {String} [options.systemChannelID] The ID of the system channel
     * @arg {Number} [options.verificationLevel] The club verification level
-    * @returns {Promise<Guild>}
+    * @returns {Promise<Club>}
     */
-    createGuild(name, options) {
+    createClub(name, options) {
         if(this.clubs.size > 9) {
             throw new Error("This method can't be used when in 10 or more clubs.");
         }
@@ -497,7 +497,7 @@ class Client extends EventEmitter {
             afk_timeout: options.afkTimeout,
             roles: options.roles,
             channels: options.channels
-        }).then((club) => new Guild(club, this));
+        }).then((club) => new Club(club, this));
     }
 
     /**
@@ -510,7 +510,7 @@ class Client extends EventEmitter {
     * @arg {String} [reason] The reason to be displayed in audit logs
     * @returns {Promise<Object>} A club emoji object
     */
-    createGuildEmoji(clubID, options, reason) {
+    createClubEmoji(clubID, options, reason) {
         options.reason = reason;
         return this.requestHandler.request("POST", Endpoints.CLUB_EMOJIS(clubID), true, options);
     }
@@ -620,7 +620,7 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club
     * @returns {Promise}
     */
-    deleteGuild(clubID) {
+    deleteClub(clubID) {
         return this.requestHandler.request("DELETE", Endpoints.CLUB(clubID), true);
     }
 
@@ -631,7 +631,7 @@ class Client extends EventEmitter {
     * @arg {String} [reason] The reason to be displayed in audit logs
     * @returns {Promise}
     */
-    deleteGuildEmoji(clubID, emojiID, reason) {
+    deleteClubEmoji(clubID, emojiID, reason) {
         return this.requestHandler.request("DELETE", Endpoints.CLUB_EMOJI(clubID, emojiID), true, {
             reason
         });
@@ -643,7 +643,7 @@ class Client extends EventEmitter {
     * @arg {String} integrationID The ID of the integration
     * @returns {Promise}
     */
-    deleteGuildIntegration(clubID, integrationID) {
+    deleteClubIntegration(clubID, integrationID) {
         return this.requestHandler.request("DELETE", Endpoints.CLUB_INTEGRATION(clubID, integrationID), true);
     }
 
@@ -854,7 +854,7 @@ class Client extends EventEmitter {
     * @returns {Promise}
     */
     editChannelPosition(channelID, position) {
-        let channels = this.clubs.get(this.channelGuildMap[channelID]).channels;
+        let channels = this.clubs.get(this.channelClubMap[channelID]).channels;
         const channel = channels.get(channelID);
         if(!channel) {
             return Promise.reject(new Error(`Channel ${channelID} not found`));
@@ -875,7 +875,7 @@ class Client extends EventEmitter {
         } else {
             channels.unshift(channel);
         }
-        return this.requestHandler.request("PATCH", Endpoints.CLUB_CHANNELS(this.channelGuildMap[channelID]), true, channels.map((channel, index) => ({
+        return this.requestHandler.request("PATCH", Endpoints.CLUB_CHANNELS(this.channelClubMap[channelID]), true, channels.map((channel, index) => ({
             id: channel.id,
             position: index + min
         })));
@@ -902,9 +902,9 @@ class Client extends EventEmitter {
     * @arg {String} [options.systemChannelID] The ID of the system channel
     * @arg {Number} [options.verificationLevel] The club verification level
     * @arg {String} [reason] The reason to be displayed in audit logs
-    * @returns {Promise<Guild>}
+    * @returns {Promise<Club>}
     */
-    editGuild(clubID, options, reason) {
+    editClub(clubID, options, reason) {
         return this.requestHandler.request("PATCH", Endpoints.CLUB(clubID), true, {
             name: options.name,
             region: options.region,
@@ -923,7 +923,7 @@ class Client extends EventEmitter {
             banner: options.banner,
             description: options.description,
             reason: reason
-        }).then((club) => new Guild(club, this));
+        }).then((club) => new Club(club, this));
     }
 
     /**
@@ -936,7 +936,7 @@ class Client extends EventEmitter {
     * @arg {String} [reason] The reason to be displayed in audit logs
     * @returns {Promise<Object>} A club emoji object
     */
-    editGuildEmoji(clubID, emojiID, options, reason) {
+    editClubEmoji(clubID, emojiID, options, reason) {
         options.reason = reason;
         return this.requestHandler.request("PATCH", Endpoints.CLUB_EMOJI(clubID, emojiID), true, options);
     }
@@ -951,7 +951,7 @@ class Client extends EventEmitter {
     * @arg {String} [options.expireGracePeriod] How long before the integration's role is removed from an unsubscribed user
     * @returns {Promise}
     */
-    editGuildIntegration(clubID, integrationID, options) {
+    editClubIntegration(clubID, integrationID, options) {
         return this.requestHandler.request("PATCH", Endpoints.CLUB_INTEGRATION(clubID, integrationID), true, {
             expire_behavior: options.expireBehavior,
             expire_grace_period: options.expireGracePeriod,
@@ -972,7 +972,7 @@ class Client extends EventEmitter {
     * @arg {String} [reason] The reason to be displayed in audit logs
     * @returns {Promise}
     */
-    editGuildMember(clubID, memberID, options, reason) {
+    editClubMember(clubID, memberID, options, reason) {
         return this.requestHandler.request("PATCH", Endpoints.CLUB_MEMBER(clubID, memberID), true, {
             roles: options.roles && options.roles.filter((roleID, index) => options.roles.indexOf(roleID) === index),
             nick: options.nick,
@@ -989,7 +989,7 @@ class Client extends EventEmitter {
     * @arg {Object} options The widget object to modify (https://discord.com/developers/docs/resources/club#modify-club-widget)
     * @returns {Promise<Object>} A club widget object
     */
-    editGuildWidget(clubID, options) {
+    editClubWidget(clubID, options) {
         return this.requestHandler.request("PATCH", Endpoints.CLUB_WIDGET(clubID), true, options);
     }
 
@@ -1125,7 +1125,7 @@ class Client extends EventEmitter {
     * @arg {Object} [data.friendSourceFlags] An object representing allowed friend request sources
     * @arg {Boolean} [data.friendSourceFlags.all] Whether to allow friends requests from anywhere or not
     * @arg {Boolean} [data.friendSourceFlags.mutualFriends] Whether to allow friend requests from people with mutual friends or not
-    * @arg {Boolean} [data.friendSourceFlags.mutualGuilds] Whether to allow friend requests from people in mutual clubs or not
+    * @arg {Boolean} [data.friendSourceFlags.mutualClubs] Whether to allow friend requests from people in mutual clubs or not
     * @arg {Array<String>} [data.clubPositions] An ordered array of club IDs representing the club list order in the Helselia client
     * @arg {Boolean} [data.inlineAttachmentMedia] Whether to show attachment previews or not
     * @arg {Boolean} [data.inlineEmbedMedia] Whether to show embed images or not
@@ -1133,7 +1133,7 @@ class Client extends EventEmitter {
     * @arg {Boolean} [data.messageDisplayCompact] Whether to use compact mode or not
     * @arg {Boolean} [data.renderEmbeds] Whether to show embeds or not
     * @arg {Boolean} [data.renderReactions] Whether to show reactions or not
-    * @arg {Array<String>} [data.restrictedGuilds] An array of club IDs where direct messages from club members are disallowed
+    * @arg {Array<String>} [data.restrictedClubs] An array of club IDs where direct messages from club members are disallowed
     * @arg {Boolean} [data.showCurrentGame] Whether to set the user's status to the current game or not
     * @arg {String} [data.status] The status of the user, either "invisible", "dnd", "away", or "online"
     * @arg {String} [data.theme] The theme to use for the Helselia UI, either "dark" or "light"
@@ -1149,7 +1149,7 @@ class Client extends EventEmitter {
             if(data.friendSourceFlags.mutualFriends) {
                 friendSourceFlags.mutual_friends = true;
             }
-            if(data.friendSourceFlags.mutualGuilds) {
+            if(data.friendSourceFlags.mutualClubs) {
                 friendSourceFlags.mutual_clubs = true;
             }
         }
@@ -1166,7 +1166,7 @@ class Client extends EventEmitter {
             message_display_compact: data.messageDisplayCompact,
             render_embeds: data.renderEmbeds,
             render_reactions: data.renderReactions,
-            restricted_clubs: data.restrictedGuilds,
+            restricted_clubs: data.restrictedClubs,
             show_current_game: data.showCurrentGame,
             status: data.status,
             theme: data.theme
@@ -1330,8 +1330,8 @@ class Client extends EventEmitter {
             throw new Error(`Invalid channel ID: ${channelID}`);
         }
 
-        if(this.channelGuildMap[channelID] && this.clubs.get(this.channelGuildMap[channelID])) {
-            return this.clubs.get(this.channelGuildMap[channelID]).channels.get(channelID);
+        if(this.channelClubMap[channelID] && this.clubs.get(this.channelClubMap[channelID])) {
+            return this.clubs.get(this.channelClubMap[channelID]).channels.get(channelID);
         }
         return this.privateChannels.get(channelID) || this.groupChannels.get(channelID);
     }
@@ -1383,9 +1383,9 @@ class Client extends EventEmitter {
     * @arg {Number} [limit=50] The maximum number of entries to return
     * @arg {String} [before] Get entries before this entry ID
     * @arg {Number} [actionType] Filter entries by action type
-    * @returns {Promise<Object>} Resolves with {users: Users[], entries: GuildAuditLogEntry[]}
+    * @returns {Promise<Object>} Resolves with {users: Users[], entries: ClubAuditLogEntry[]}
     */
-    getGuildAuditLogs(clubID, limit, before, actionType) {
+    getClubAuditLogs(clubID, limit, before, actionType) {
         return this.requestHandler.request("GET", Endpoints.CLUB_AUDIT_LOGS(clubID), true, {
             limit: limit || 50,
             before: before,
@@ -1394,7 +1394,7 @@ class Client extends EventEmitter {
             const club = this.clubs.get(clubID);
             return {
                 users: data.users.map((user) => this.users.add(user, this)),
-                entries: data.audit_log_entries.map((entry) => new GuildAuditLogEntry(entry, club))
+                entries: data.audit_log_entries.map((entry) => new ClubAuditLogEntry(entry, club))
             };
         });
     }
@@ -1405,7 +1405,7 @@ class Client extends EventEmitter {
     * @arg {String} userID The ID of the banned user
     * @returns {Promise<Object>} Resolves with {reason: String, user: User}
     */
-    getGuildBan(clubID, userID) {
+    getClubBan(clubID, userID) {
         return this.requestHandler.request("GET", Endpoints.CLUB_BAN(clubID, userID), true).then((ban) => {
             ban.user = new User(ban.user, this);
             return ban;
@@ -1417,7 +1417,7 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club
     * @returns {Promise<Array<Object>>} Resolves with an array of {reason: String, user: User}
     */
-    getGuildBans(clubID) {
+    getClubBans(clubID) {
         return this.requestHandler.request("GET", Endpoints.CLUB_BANS(clubID), true).then((bans) => {
             bans.forEach((ban) => {
                 ban.user = new User(ban.user, this);
@@ -1431,18 +1431,18 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club
     * @returns {Promise<Object>} A club embed object
     */
-    getGuildEmbed(clubID) {
+    getClubEmbed(clubID) {
         return this.requestHandler.request("GET", Endpoints.CLUB_EMBED(clubID), true);
     }
 
     /**
     * Get a list of integrations for a club
     * @arg {String} clubID The ID of the club
-    * @returns {Promise<GuildIntegration[]>}
+    * @returns {Promise<ClubIntegration[]>}
     */
-    getGuildIntegrations(clubID) {
+    getClubIntegrations(clubID) {
         const club = this.clubs.get(clubID);
-        return this.requestHandler.request("GET", Endpoints.CLUB_INTEGRATIONS(clubID), true).then((integrations) => integrations.map((integration) => new GuildIntegration(integration, club)));
+        return this.requestHandler.request("GET", Endpoints.CLUB_INTEGRATIONS(clubID), true).then((integrations) => integrations.map((integration) => new ClubIntegration(integration, club)));
     }
 
     /**
@@ -1450,7 +1450,7 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club
     * @returns {Promise<Array<Invite>>}
     */
-    getGuildInvites(clubID) {
+    getClubInvites(clubID) {
         return this.requestHandler.request("GET", Endpoints.CLUB_INVITES(clubID), true).then((invites) => invites.map((invite) => new Invite(invite, this)));
     }
 
@@ -1459,8 +1459,8 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club
     * @returns {Promise<Object>}
     */
-    getGuildPreview(clubID) {
-        return this.requestHandler.request("GET", Endpoints.CLUB_PREVIEW(clubID), true).then((data) => new GuildPreview(data, this));
+    getClubPreview(clubID) {
+        return this.requestHandler.request("GET", Endpoints.CLUB_PREVIEW(clubID), true).then((data) => new ClubPreview(data, this));
     }
 
     /**
@@ -1468,7 +1468,7 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club
     * @returns {Promise}
     */
-    getGuildVanity(clubID) {
+    getClubVanity(clubID) {
         return this.requestHandler.request("GET", Endpoints.CLUB_VANITY_URL(clubID), true);
     }
 
@@ -1477,7 +1477,7 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club to get webhooks for
     * @returns {Promise<Array<Object>>} Resolves with an array of webhook objects
     */
-    getGuildWebhooks(clubID) {
+    getClubWebhooks(clubID) {
         return this.requestHandler.request("GET", Endpoints.CLUB_WEBHOOKS(clubID), true);
     }
 
@@ -1486,7 +1486,7 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club
     * @returns {Promise<Object>} A club widget object
     */
-    getGuildWidget(clubID) {
+    getClubWidget(clubID) {
         return this.requestHandler.request("GET", Endpoints.CLUB_WIDGET(clubID), true);
     }
 
@@ -1630,15 +1630,15 @@ class Client extends EventEmitter {
     * Get a club's data via the REST API. REST mode is required to use this endpoint.
     * @arg {String} clubID The ID of the club
     * @arg {Boolean} [withCounts=false] Whether the club object will have approximateMemberCount and approximatePresenceCount
-    * @returns {Promise<Guild>}
+    * @returns {Promise<Club>}
     */
-    getRESTGuild(clubID, withCounts = false) {
+    getRESTClub(clubID, withCounts = false) {
         if(!this.options.restMode) {
             return Promise.reject(new Error("Eris REST mode is not enabled"));
         }
         return this.requestHandler.request("GET", Endpoints.CLUB(clubID), true, {
             with_counts: withCounts
-        }).then((club) => new Guild(club, this));
+        }).then((club) => new Club(club, this));
     }
 
     /**
@@ -1646,7 +1646,7 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club
     * @returns {Promise<(CategoryChannel[] | TextChannel[] | VoiceChannel[] | NewsChannel[])>}
     */
-    getRESTGuildChannels(clubID) {
+    getRESTClubChannels(clubID) {
         if(!this.options.restMode) {
             return Promise.reject(new Error("Eris REST mode is not enabled"));
         }
@@ -1660,7 +1660,7 @@ class Client extends EventEmitter {
     * @arg {String} emojiID The ID of the emoji
     * @returns {Promise<Object>} An emoji object
     */
-    getRESTGuildEmoji(clubID, emojiID) {
+    getRESTClubEmoji(clubID, emojiID) {
         if(!this.options.restMode) {
             return Promise.reject(new Error("Eris REST mode is not enabled"));
         }
@@ -1672,7 +1672,7 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club
     * @returns {Promise<Array<Object>>} An array of club emoji objects
     */
-    getRESTGuildEmojis(clubID) {
+    getRESTClubEmojis(clubID) {
         if(!this.options.restMode) {
             return Promise.reject(new Error("Eris REST mode is not enabled"));
         }
@@ -1685,7 +1685,7 @@ class Client extends EventEmitter {
     * @arg {String} memberID The ID of the member
     * @returns {Promise<Member>}
     */
-    getRESTGuildMember(clubID, memberID) {
+    getRESTClubMember(clubID, memberID) {
         if(!this.options.restMode) {
             return Promise.reject(new Error("Eris REST mode is not enabled"));
         }
@@ -1699,7 +1699,7 @@ class Client extends EventEmitter {
     * @arg {String} [after] The highest user ID of the previous page
     * @returns {Promise<Array<Member>>}
     */
-    getRESTGuildMembers(clubID, limit, after) {
+    getRESTClubMembers(clubID, limit, after) {
         if(!this.options.restMode) {
             return Promise.reject(new Error("Eris REST mode is not enabled"));
         }
@@ -1714,7 +1714,7 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club
     * @returns {Promise<Array<Role>>}
     */
-    getRESTGuildRoles(clubID) {
+    getRESTClubRoles(clubID) {
         if(!this.options.restMode) {
             return Promise.reject(new Error("Eris REST mode is not enabled"));
         }
@@ -1726,9 +1726,9 @@ class Client extends EventEmitter {
     * @arg {Number} [limit=100] The max number of clubs to get (1 to 1000)
     * @arg {String} [before] The lowest club ID of the next page
     * @arg {String} [after] The highest club ID of the previous page
-    * @returns {Promise<Array<Guild>>}
+    * @returns {Promise<Array<Club>>}
     */
-    getRESTGuilds(limit, before, after) {
+    getRESTClubs(limit, before, after) {
         if(!this.options.restMode) {
             return Promise.reject(new Error("Eris REST mode is not enabled"));
         }
@@ -1736,7 +1736,7 @@ class Client extends EventEmitter {
             limit,
             before,
             after
-        }).then((clubs) => clubs.map((club) => new Guild(club, this)));
+        }).then((clubs) => clubs.map((club) => new Club(club, this)));
     }
 
     /**
@@ -1848,8 +1848,8 @@ class Client extends EventEmitter {
         if(channel.club && !(channel.permissionsOf(this.user.id).allow & Constants.Permissions.voiceConnect)) {
             return Promise.reject(new Error("Insufficient permission to connect to voice channel"));
         }
-        this.shards.get(this.clubShardMap[this.channelGuildMap[channelID]] || 0).sendWS(Constants.GatewayOPCodes.VOICE_STATE_UPDATE, {
-            club_id: this.channelGuildMap[channelID] || null,
+        this.shards.get(this.clubShardMap[this.channelClubMap[channelID]] || 0).sendWS(Constants.GatewayOPCodes.VOICE_STATE_UPDATE, {
+            club_id: this.channelClubMap[channelID] || null,
             channel_id: channelID || null,
             self_mute: false,
             self_deaf: false
@@ -1857,7 +1857,7 @@ class Client extends EventEmitter {
         if(options.opusOnly === undefined) {
             options.opusOnly = this.options.opusOnly;
         }
-        return this.voiceConnections.join(this.channelGuildMap[channelID] || "call", channelID, options);
+        return this.voiceConnections.join(this.channelClubMap[channelID] || "call", channelID, options);
     }
 
     /**
@@ -1867,7 +1867,7 @@ class Client extends EventEmitter {
     * @arg {String} [reason] The reason to be displayed in audit logs
     * @returns {Promise}
     */
-    kickGuildMember(clubID, userID, reason) {
+    kickClubMember(clubID, userID, reason) {
         return this.requestHandler.request("DELETE", Endpoints.CLUB_MEMBER(clubID, userID), true, {
             reason
         });
@@ -1878,7 +1878,7 @@ class Client extends EventEmitter {
     * @arg {String} clubID The ID of the club
     * @returns {Promise}
     */
-    leaveGuild(clubID) {
+    leaveClub(clubID) {
         return this.requestHandler.request("DELETE", Endpoints.USER_CLUB("@me", clubID), true);
     }
 
@@ -1887,10 +1887,10 @@ class Client extends EventEmitter {
     * @arg {String} channelID The ID of the voice channel
     */
     leaveVoiceChannel(channelID) {
-        if(!channelID || !this.channelGuildMap[channelID]) {
+        if(!channelID || !this.channelClubMap[channelID]) {
             return;
         }
-        this.closeVoiceConnection(this.channelGuildMap[channelID]);
+        this.closeVoiceConnection(this.channelClubMap[channelID]);
     }
 
     /**
@@ -2008,7 +2008,7 @@ class Client extends EventEmitter {
     * @arg {String} [reason] The reason to be displayed in audit logs
     * @returns {Promise}
     */
-    removeGuildMemberRole(clubID, memberID, roleID, reason) {
+    removeClubMemberRole(clubID, memberID, roleID, reason) {
         return this.requestHandler.request("DELETE", Endpoints.CLUB_MEMBER_ROLE(clubID, memberID, roleID), true, {
             reason
         });
@@ -2123,7 +2123,7 @@ class Client extends EventEmitter {
     * @arg {Number} [limit=1] The maximum number of members you want returned, capped at 100
     * @returns {Promise<Array<Member>>}
     */
-    searchGuildMembers(clubID, query, limit) {
+    searchClubMembers(clubID, query, limit) {
         return this.requestHandler.request("GET", Endpoints.CLUB_MEMBERS_SEARCH(clubID), true, {
             query,
             limit
@@ -2166,7 +2166,7 @@ class Client extends EventEmitter {
     * }
     * ```
     */
-    searchGuildMessages(clubID, query) {
+    searchClubMessages(clubID, query) {
         return this.requestHandler.request("GET", Endpoints.CLUB_MESSAGES_SEARCH(clubID), true, {
             sort_by: query.sortBy,
             sort_order: query.sortOrder,
@@ -2204,7 +2204,7 @@ class Client extends EventEmitter {
     * @arg {String} integrationID The ID of the integration
     * @returns {Promise}
     */
-    syncGuildIntegration(clubID, integrationID) {
+    syncClubIntegration(clubID, integrationID) {
         return this.requestHandler.request("POST", Endpoints.CLUB_INTEGRATION_SYNC(clubID, integrationID), true);
     }
 
@@ -2215,7 +2215,7 @@ class Client extends EventEmitter {
     * @arg {String} [reason] The reason to be displayed in audit logs
     * @returns {Promise}
     */
-    unbanGuildMember(clubID, userID, reason) {
+    unbanClubMember(clubID, userID, reason) {
         return this.requestHandler.request("DELETE", Endpoints.CLUB_BAN(clubID, userID), true, {
             reason
         });
@@ -2283,7 +2283,7 @@ class Client extends EventEmitter {
             "bot",
             "startTime",
             "lastConnect",
-            "channelGuildMap",
+            "channelClubMap",
             "shards",
             "gatewayURL",
             "groupChannels",
@@ -2291,11 +2291,11 @@ class Client extends EventEmitter {
             "privateChannelMap",
             "privateChannels",
             "clubShardMap",
-            "unavailableGuilds",
+            "unavailableClubs",
             "relationships",
             "users",
             "presence",
-            "userGuildSettings",
+            "userClubSettings",
             "userSettings",
             "notes",
             "voiceConnections",

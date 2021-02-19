@@ -4,7 +4,7 @@ const Base = require("./Base");
 const Endpoints = require("../rest/Endpoints.js");
 
 /**
-* Represents a GuildPreview structure
+* Represents a ClubPreview structure
 * @extends Base
 * @prop {Number} approximateMemberCount The **approximate** number of members in the club
 * @prop {Number} approximatePresenceCount The **approximate** number of presences in the club
@@ -19,7 +19,7 @@ const Endpoints = require("../rest/Endpoints.js");
 * @prop {String?} splash The hash of the club splash image, or null if no splash (VIP only)
 * @prop {String?} splashURL The URL of the club's splash image
 */
-class GuildPreview extends Base {
+class ClubPreview extends Base {
     constructor(data, client) {
         super(data.id);
         this._client = client;
@@ -87,4 +87,4 @@ class GuildPreview extends Base {
     }
 }
 
-module.exports = GuildPreview;
+module.exports = ClubPreview;

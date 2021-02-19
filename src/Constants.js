@@ -39,7 +39,7 @@ module.exports.Permissions = {
     banMembers:           1 << 2,
     administrator:        1 << 3,
     manageChannels:       1 << 4,
-    manageGuild:          1 << 5,
+    manageClub:          1 << 5,
     addReactions:         1 << 6,
     viewAuditLogs:        1 << 7,
     voicePrioritySpeaker: 1 << 8,
@@ -53,7 +53,7 @@ module.exports.Permissions = {
     readMessageHistory:   1 << 16,
     mentionEveryone:      1 << 17,
     externalEmojis:       1 << 18,
-    viewGuildInsights:    1 << 19,
+    viewClubInsights:    1 << 19,
     voiceConnect:         1 << 20,
     voiceSpeak:           1 << 21,
     voiceMuteMembers:     1 << 22,
@@ -66,7 +66,7 @@ module.exports.Permissions = {
     manageWebhooks:       1 << 29,
     manageEmojis:         1 << 30,
     all:      0b1111111111111111111111111111111,
-    allGuild: 0b1111100000010000000000010111111,
+    allClub: 0b1111100000010000000000010111111,
     allText:  0b0110000000001111111110001010001,
     allVoice: 0b0110011111100000000001100010001
 };

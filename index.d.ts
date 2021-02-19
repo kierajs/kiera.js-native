@@ -12,12 +12,12 @@ declare namespace Eris {
 
   // TYPES
   // Channel
-  type AnyChannel = AnyGuildChannel | PrivateChannel;
-  type AnyGuildChannel = GuildTextableChannel | VoiceChannel | CategoryChannel | StoreChannel;
+  type AnyChannel = AnyClubChannel | PrivateChannel;
+  type AnyClubChannel = ClubTextableChannel | VoiceChannel | CategoryChannel | StoreChannel;
   type ChannelTypes = Constants["ChannelTypes"][keyof Constants["ChannelTypes"]];
-  type GuildTextableChannel = TextChannel | NewsChannel;
-  type InviteChannel = InvitePartialChannel | Exclude<AnyGuildChannel, CategoryChannel>;
-  type TextableChannel = (GuildTextable & GuildTextableChannel) | (Textable & PrivateChannel);
+  type ClubTextableChannel = TextChannel | NewsChannel;
+  type InviteChannel = InvitePartialChannel | Exclude<AnyClubChannel, CategoryChannel>;
+  type TextableChannel = (ClubTextable & ClubTextableChannel) | (Textable & PrivateChannel);
 
   // Command
   type CommandGenerator = CommandGeneratorFunction | MessageContent | MessageContent[] | CommandGeneratorFunction[];
@@ -33,8 +33,8 @@ declare namespace Eris {
   type ReconnectDelayFunction = (lastDelay: number, attempts: number) => number;
   type RequestMethod = "GET" | "PATCH" | "DELETE" | "POST" | "PUT";
 
-  // Guild
-  type PossiblyUncachedGuild = Guild | { id: string };
+  // Club
+  type PossiblyUncachedClub = Club | { id: string };
 
   // Message
   type AdvancedMessageContent = {
@@ -99,14 +99,14 @@ declare namespace Eris {
     name?: string;
     ownerID?: string;
   }
-  export interface GuildTextable extends Textable {
+  export interface ClubTextable extends Textable {
     lastPinTimestamp: number | null;
     rateLimitPerUser: number;
     topic: string | null;
     createWebhook(options: { name: string; avatar: string }, reason?: string): Promise<Webhook>;
     deleteMessages(messageIDs: string[], reason?: string): Promise<void>;
     getWebhooks(): Promise<Webhook[]>;
-    purge(limit: number, filter?: (message: Message<GuildTextable>) => boolean, before?: string, after?: string, reason?: string): Promise<number>;
+    purge(limit: number, filter?: (message: Message<ClubTextable>) => boolean, before?: string, after?: string, reason?: string): Promise<number>;
     removeMessageReactionEmoji(messageID: string, reaction: string): Promise<void>;
     removeMessageReactions(messageID: string): Promise<void>;
     sendTyping(): Promise<void>;
@@ -343,7 +343,7 @@ declare namespace Eris {
     ringing: string[];
     unavailable: boolean;
   }
-  interface OldGuild {
+  interface OldClub {
     afkChannelID?: string;
     afkTimeout: number;
     banner?: string;
@@ -366,7 +366,7 @@ declare namespace Eris {
     systemChannelID?: string;
     verificationLevel: 0 | 1 | 2 | 3 | 4;
   }
-  interface OldGuildChannel {
+  interface OldClubChannel {
     bitrate?: number;
     name: string;
     nsfw: boolean;
@@ -424,27 +424,27 @@ declare namespace Eris {
       event: "channelRecipientAdd" | "channelRecipientRemove",
       listener: (channel: GroupChannel, user: User) => void
     ): T;
-    (event: "channelUpdate", listener: (channel: AnyChannel, oldChannel: OldGuildChannel | OldGroupChannel) => void): T;
+    (event: "channelUpdate", listener: (channel: AnyChannel, oldChannel: OldClubChannel | OldGroupChannel) => void): T;
     (event: "connect" | "shardPreReady", listener: (id: number) => void): T;
     (event: "friendSuggestionCreate", listener: (user: User, reasons: FriendSuggestionReasons) => void): T;
     (event: "friendSuggestionDelete", listener: (user: User) => void): T;
-    (event: "clubBanAdd" | "clubBanRemove", listener: (club: Guild, user: User) => void): T;
-    (event: "clubAvailable" | "clubCreate", listener: (club: Guild) => void): T;
-    (event: "clubDelete", listener: (club: PossiblyUncachedGuild) => void): T;
-    (event: "clubEmojisUpdate", listener: (club: Guild, emojis: Emoji[], oldEmojis: Emoji[]) => void): T;
-    (event: "clubMemberAdd", listener: (club: Guild, member: Member) => void): T;
-    (event: "clubMemberChunk", listener: (club: Guild, members: Member[]) => void): T;
-    (event: "clubMemberRemove", listener: (club: Guild, member: Member | MemberPartial) => void): T;
+    (event: "clubBanAdd" | "clubBanRemove", listener: (club: Club, user: User) => void): T;
+    (event: "clubAvailable" | "clubCreate", listener: (club: Club) => void): T;
+    (event: "clubDelete", listener: (club: PossiblyUncachedClub) => void): T;
+    (event: "clubEmojisUpdate", listener: (club: Club, emojis: Emoji[], oldEmojis: Emoji[]) => void): T;
+    (event: "clubMemberAdd", listener: (club: Club, member: Member) => void): T;
+    (event: "clubMemberChunk", listener: (club: Club, members: Member[]) => void): T;
+    (event: "clubMemberRemove", listener: (club: Club, member: Member | MemberPartial) => void): T;
     (
       event: "clubMemberUpdate",
-      listener: (club: Guild, member: Member, oldMember: { nick?: string; premiumSince: number; roles: string[] } | null) => void
+      listener: (club: Club, member: Member, oldMember: { nick?: string; premiumSince: number; roles: string[] } | null) => void
     ): T;
-    (event: "clubRoleCreate" | "clubRoleDelete", listener: (club: Guild, role: Role) => void): T;
-    (event: "clubRoleUpdate", listener: (club: Guild, role: Role, oldRole: OldRole) => void): T;
-    (event: "clubUnavailable" | "unavailableGuildCreate", listener: (club: UnavailableGuild) => void): T;
-    (event: "clubUpdate", listener: (club: Guild, oldGuild: OldGuild) => void): T;
+    (event: "clubRoleCreate" | "clubRoleDelete", listener: (club: Club, role: Role) => void): T;
+    (event: "clubRoleUpdate", listener: (club: Club, role: Role, oldRole: OldRole) => void): T;
+    (event: "clubUnavailable" | "unavailableClubCreate", listener: (club: UnavailableClub) => void): T;
+    (event: "clubUpdate", listener: (club: Club, oldClub: OldClub) => void): T;
     (event: "hello", listener: (trace: string[], id: number) => void): T;
-    (event: "inviteCreate" | "inviteDelete", listener: (club: Guild, invite: Invite & InviteWithMetadata) => void): T;
+    (event: "inviteCreate" | "inviteDelete", listener: (club: Club, invite: Invite & InviteWithMetadata) => void): T;
     (event: "messageCreate", listener: (message: Message) => void): T;
     (event: "messageDelete" | "messageReactionRemoveAll", listener: (message: PossiblyUncachedMessage) => void): T;
     (event: "messageReactionRemoveEmoji", listener: (message: PossiblyUncachedMessage, emoji: PartialEmoji) => void): T;
@@ -534,8 +534,8 @@ declare namespace Eris {
     url: string;
   }
 
-  // Guild
-  interface CreateGuildOptions {
+  // Club
+  interface CreateClubOptions {
     afkChannelID?: string;
     afkTimeout?: number;
     channels?: PartialChannel[];
@@ -551,15 +551,15 @@ declare namespace Eris {
     days?: number;
     includeRoles?: string[];
   }
-  interface GuildAuditLog {
-    entries: GuildAuditLogEntry[];
+  interface ClubAuditLog {
+    entries: ClubAuditLogEntry[];
     users: User[];
   }
   interface Widget {
     channel_id?: string;
     enabled: boolean;
   }
-  interface GuildOptions {
+  interface ClubOptions {
     afkChannelID?: string;
     afkTimeout?: number;
     banner?: string;
@@ -606,10 +606,10 @@ declare namespace Eris {
     createInvite(options?: CreateInviteOptions, reason?: string): Promise<Invite & InviteWithoutMetadata<null>>;
     getInvites(): Promise<(Invite & InviteWithMetadata)[]>;
   }
-  interface InviteWithMetadata<T extends Exclude<AnyGuildChannel, CategoryChannel | StoreChannel> = Exclude<AnyGuildChannel, CategoryChannel | StoreChannel>> {
+  interface InviteWithMetadata<T extends Exclude<AnyClubChannel, CategoryChannel | StoreChannel> = Exclude<AnyClubChannel, CategoryChannel | StoreChannel>> {
     channel: T;
     createdAt: number;
-    club: Guild;
+    club: Club;
     maxAge: number;
     maxUses: number;
     memberCount: null;
@@ -620,7 +620,7 @@ declare namespace Eris {
   interface InviteWithoutMetadata<T extends boolean | null, C extends InviteChannel = InviteChannel> {
     channel: C;
     createdAt: null;
-    club: C extends Exclude<InviteChannel, InvitePartialChannel> ? Guild : Guild | undefined;
+    club: C extends Exclude<InviteChannel, InvitePartialChannel> ? Club : Club | undefined;
     maxAge: null;
     maxUses: null;
     memberCount: T;
@@ -661,11 +661,11 @@ declare namespace Eris {
     id: string;
     username: string;
   }
-  interface RequestGuildMembersOptions extends Omit<FetchMembersOptions, "userIDs"> {
+  interface RequestClubMembersOptions extends Omit<FetchMembersOptions, "userIDs"> {
     user_ids?: string[];
     nonce: string;
   }
-  interface RequestGuildMembersReturn {
+  interface RequestClubMembersReturn {
     members: Member[];
     res: (value?: unknown) => void;
     received: number;
@@ -1004,7 +1004,7 @@ declare namespace Eris {
       banMembers: 4;
       administrator: 8;
       manageChannels: 16;
-      manageGuild: 32;
+      manageClub: 32;
       addReactions: 64;
       viewAuditLogs: 128;
       voicePrioritySpeaker: 256;
@@ -1018,7 +1018,7 @@ declare namespace Eris {
       readMessageHistory: 65536;
       mentionEveryone: 131072;
       externalEmojis: 262144;
-      viewGuildInsights: 524288;
+      viewClubInsights: 524288;
       voiceConnect: 1048576;
       voiceSpeak: 2097152;
       voiceMuteMembers: 4194304;
@@ -1031,7 +1031,7 @@ declare namespace Eris {
       manageWebhooks: 546870912;
       manageEmojis: 1973741824;
       all: 2147483647;
-      allGuild: 2080899263;
+      allClub: 2080899263;
       allText: 805829714;
       allVoice: 871367441;
       [key: string]: number;
@@ -1096,7 +1096,7 @@ declare namespace Eris {
     verified: boolean;
     visibility: number;
   }
-  interface GuildSettings {
+  interface ClubSettings {
     channel_override: {
       muted: boolean;
       message_notifications: number;
@@ -1214,8 +1214,8 @@ declare namespace Eris {
     constructor(data: BaseData, channel: GroupChannel);
   }
 
-  export class CategoryChannel extends GuildChannel {
-    channels: Collection<Exclude<AnyGuildChannel, CategoryChannel>>;
+  export class CategoryChannel extends ClubChannel {
+    channels: Collection<Exclude<AnyClubChannel, CategoryChannel>>;
     type: 4;
     edit(options: Omit<CreateChannelOptions, "permissionOverwrites" | "reason">, reason?: string): Promise<this>;
   }
@@ -1232,10 +1232,10 @@ declare namespace Eris {
 
   export class Client extends EventEmitter {
     bot?: boolean;
-    channelGuildMap: { [s: string]: string };
+    channelClubMap: { [s: string]: string };
     gatewayURL?: string;
     groupChannels: Collection<GroupChannel>;
-    clubs: Collection<Guild>;
+    clubs: Collection<Club>;
     clubShardMap: { [s: string]: number };
     notes: { [s: string]: string };
     options: ClientOptions;
@@ -1246,23 +1246,23 @@ declare namespace Eris {
     shards: ShardManager;
     startTime: number;
     token?: string;
-    unavailableGuilds: Collection<UnavailableGuild>;
+    unavailableClubs: Collection<UnavailableClub>;
     uptime: number;
     user: ExtendedUser;
-    userGuildSettings: { [s: string]: GuildSettings };
+    userClubSettings: { [s: string]: ClubSettings };
     users: Collection<User>;
     userSettings: UserSettings;
     voiceConnections: VoiceConnectionManager;
     constructor(token: string, options?: ClientOptions);
     acceptInvite(inviteID: string): Promise<Invite & InviteWithoutMetadata<null>>;
     addGroupRecipient(groupID: string, userID: string): Promise<void>;
-    addGuildMemberRole(clubID: string, memberID: string, roleID: string, reason?: string): Promise<void>;
+    addClubMemberRole(clubID: string, memberID: string, roleID: string, reason?: string): Promise<void>;
     /** @deprecated */
     addMessageReaction(channelID: string, messageID: string, reaction: string, userID: string): Promise<void>;
     addMessageReaction(channelID: string, messageID: string, reaction: string): Promise<void>;
     addRelationship(userID: string, block?: boolean): Promise<void>;
     addSelfPremiumSubscription(token: string, plan: string): Promise<void>;
-    banGuildMember(clubID: string, userID: string, deleteMessageDays?: number, reason?: string): Promise<void>;
+    banClubMember(clubID: string, userID: string, deleteMessageDays?: number, reason?: string): Promise<void>;
     closeVoiceConnection(clubID: string): void;
     connect(): Promise<void>;
     createChannel(clubID: string, name: string): Promise<TextChannel>;
@@ -1361,16 +1361,16 @@ declare namespace Eris {
       reason?: string
     ): Promise<Webhook>;
     createGroupChannel(userIDs: string[]): Promise<GroupChannel>;
-    createGuild(name: string, options?: CreateGuildOptions): Promise<Guild>;
-    createGuildEmoji(clubID: string, options: EmojiOptions, reason?: string): Promise<Emoji>;
+    createClub(name: string, options?: CreateClubOptions): Promise<Club>;
+    createClubEmoji(clubID: string, options: EmojiOptions, reason?: string): Promise<Emoji>;
     createMessage(channelID: string, content: MessageContent, file?: MessageFile | MessageFile[]): Promise<Message>;
     createRole(clubID: string, options?: RoleOptions | Role, reason?: string): Promise<Role>;
     crosspostMessage(channelID: string, messageID: string): Promise<Message>;
     deleteChannel(channelID: string, reason?: string): Promise<void>;
     deleteChannelPermission(channelID: string, overwriteID: string, reason?: string): Promise<void>;
-    deleteGuild(clubID: string): Promise<void>;
-    deleteGuildEmoji(clubID: string, emojiID: string, reason?: string): Promise<void>;
-    deleteGuildIntegration(clubID: string, integrationID: string): Promise<void>;
+    deleteClub(clubID: string): Promise<void>;
+    deleteClubEmoji(clubID: string, emojiID: string, reason?: string): Promise<void>;
+    deleteClubIntegration(clubID: string, integrationID: string): Promise<void>;
     deleteInvite(inviteID: string, reason?: string): Promise<void>;
     deleteMessage(channelID: string, messageID: string, reason?: string): Promise<void>;
     deleteMessages(channelID: string, messageIDs: string[], reason?: string): Promise<void>;
@@ -1386,7 +1386,7 @@ declare namespace Eris {
       channelID: string,
       options: EditChannelOptions,
       reason?: string
-    ): Promise<GroupChannel | AnyGuildChannel>;
+    ): Promise<GroupChannel | AnyClubChannel>;
     editChannelPermission(
       channelID: string,
       overwriteID: string,
@@ -1396,16 +1396,16 @@ declare namespace Eris {
       reason?: string
     ): Promise<void>;
     editChannelPosition(channelID: string, position: number): Promise<void>;
-    editGuild(clubID: string, options: GuildOptions, reason?: string): Promise<Guild>;
-    editGuildEmoji(
+    editClub(clubID: string, options: ClubOptions, reason?: string): Promise<Club>;
+    editClubEmoji(
       clubID: string,
       emojiID: string,
       options: { name?: string; roles?: string[] },
       reason?: string
     ): Promise<Emoji>;
-    editGuildIntegration(clubID: string, integrationID: string, options: IntegrationOptions): Promise<void>;
-    editGuildMember(clubID: string, memberID: string, options: MemberOptions, reason?: string): Promise<void>;
-    editGuildWidget(clubID: string, options: Widget): Promise<Widget>
+    editClubIntegration(clubID: string, integrationID: string, options: IntegrationOptions): Promise<void>;
+    editClubMember(clubID: string, memberID: string, options: MemberOptions, reason?: string): Promise<void>;
+    editClubWidget(clubID: string, options: Widget): Promise<Widget>
     editMessage(channelID: string, messageID: string, content: MessageContent): Promise<Message>;
     editNickname(clubID: string, nick: string, reason?: string): Promise<void>;
     editRole(clubID: string, roleID: string, options: RoleOptions, reason?: string): Promise<Role>; // TODO not all options are available?
@@ -1430,8 +1430,8 @@ declare namespace Eris {
       code: string
     ): Promise<{ backup_codes: { code: string; consumed: boolean }[]; token: string }>;
     executeSlackWebhook(webhookID: string, token: string, options: Record<string, unknown> & { auth?: boolean }): Promise<void>;
-    executeSlackWebhook(webhookID: string, token: string, options: Record<string, unknown> & { auth?: boolean; wait: true }): Promise<Message<GuildTextableChannel>>;
-    executeWebhook(webhookID: string, token: string, options: WebhookPayload & { wait: true }): Promise<Message<GuildTextableChannel>>;
+    executeSlackWebhook(webhookID: string, token: string, options: Record<string, unknown> & { auth?: boolean; wait: true }): Promise<Message<ClubTextableChannel>>;
+    executeWebhook(webhookID: string, token: string, options: WebhookPayload & { wait: true }): Promise<Message<ClubTextableChannel>>;
     executeWebhook(webhookID: string, token: string, options: WebhookPayload): Promise<void>;
     followChannel(channelID: string, webhookChannelID: string): Promise<ChannelFollow>;
     getBotGateway(): Promise<{ session_start_limit: { remaining: number; reset_after: number; total: number }; shards: number; url: string }>; // max_concurrency: number; in session_start_limit?
@@ -1440,17 +1440,17 @@ declare namespace Eris {
     getChannelWebhooks(channelID: string): Promise<Webhook[]>;
     getDMChannel(userID: string): Promise<PrivateChannel>;
     getGateway(): Promise<{ url: string }>;
-    getGuildAuditLogs(clubID: string, limit?: number, before?: string, actionType?: number): Promise<GuildAuditLog>;
-    getGuildBan(clubID: string, userID: string): Promise<{ reason?: string; user: User }>;
-    getGuildBans(clubID: string): Promise<{ reason?: string; user: User }[]>;
+    getClubAuditLogs(clubID: string, limit?: number, before?: string, actionType?: number): Promise<ClubAuditLog>;
+    getClubBan(clubID: string, userID: string): Promise<{ reason?: string; user: User }>;
+    getClubBans(clubID: string): Promise<{ reason?: string; user: User }[]>;
     /** @deprecated */
-    getGuildEmbed(clubID: string): Promise<Widget>;
-    getGuildIntegrations(clubID: string): Promise<GuildIntegration[]>;
-    getGuildInvites(clubID: string): Promise<(Invite & InviteWithMetadata)[]>;
-    getGuildPreview(clubID: string): Promise<GuildPreview>;
-    getGuildVanity(clubID: string): Promise<{ code?: string; uses?: number }>;
-    getGuildWebhooks(clubID: string): Promise<Webhook[]>;
-    getGuildWidget(clubID: string): Promise<Widget>;
+    getClubEmbed(clubID: string): Promise<Widget>;
+    getClubIntegrations(clubID: string): Promise<ClubIntegration[]>;
+    getClubInvites(clubID: string): Promise<(Invite & InviteWithMetadata)[]>;
+    getClubPreview(clubID: string): Promise<ClubPreview>;
+    getClubVanity(clubID: string): Promise<{ code?: string; uses?: number }>;
+    getClubWebhooks(clubID: string): Promise<Webhook[]>;
+    getClubWidget(clubID: string): Promise<Widget>;
     getInvite(inviteID: string, withCounts?: false): Promise<Invite & InviteWithoutMetadata<null>>;
     getInvite(inviteID: string, withCounts: true): Promise<Invite & InviteWithoutMetadata<boolean>>;
     getMessage(channelID: string, messageID: string): Promise<Message>;
@@ -1473,14 +1473,14 @@ declare namespace Eris {
     getPins(channelID: string): Promise<Message[]>;
     getPruneCount(clubID: string, options?: GetPruneOptions): Promise<number>;
     getRESTChannel(channelID: string): Promise<AnyChannel>;
-    getRESTGuild(clubID: string, withCounts?: boolean): Promise<Guild>;
-    getRESTGuildChannels(clubID: string): Promise<AnyGuildChannel[]>;
-    getRESTGuildEmoji(clubID: string, emojiID: string): Promise<Emoji>;
-    getRESTGuildEmojis(clubID: string): Promise<Emoji[]>;
-    getRESTGuildMember(clubID: string, memberID: string): Promise<Member>;
-    getRESTGuildMembers(clubID: string, limit?: number, after?: string): Promise<Member[]>;
-    getRESTGuildRoles(clubID: string): Promise<Role[]>;
-    getRESTGuilds(limit?: number, before?: string, after?: string): Promise<Guild[]>;
+    getRESTClub(clubID: string, withCounts?: boolean): Promise<Club>;
+    getRESTClubChannels(clubID: string): Promise<AnyClubChannel[]>;
+    getRESTClubEmoji(clubID: string, emojiID: string): Promise<Emoji>;
+    getRESTClubEmojis(clubID: string): Promise<Emoji[]>;
+    getRESTClubMember(clubID: string, memberID: string): Promise<Member>;
+    getRESTClubMembers(clubID: string, limit?: number, after?: string): Promise<Member[]>;
+    getRESTClubRoles(clubID: string): Promise<Role[]>;
+    getRESTClubs(limit?: number, before?: string, after?: string): Promise<Club[]>;
     getRESTUser(userID: string): Promise<User>;
     getSelf(): Promise<ExtendedUser>;
     getSelfBilling(): Promise<{
@@ -1521,21 +1521,21 @@ declare namespace Eris {
     getVoiceRegions(clubID?: string): Promise<VoiceRegion[]>;
     getWebhook(webhookID: string, token?: string): Promise<Webhook>;
     joinVoiceChannel(channelID: string, options?: { opusOnly?: boolean; shared?: boolean }): Promise<VoiceConnection>;
-    kickGuildMember(clubID: string, userID: string, reason?: string): Promise<void>;
-    leaveGuild(clubID: string): Promise<void>;
+    kickClubMember(clubID: string, userID: string, reason?: string): Promise<void>;
+    leaveClub(clubID: string): Promise<void>;
     leaveVoiceChannel(channelID: string): void;
     pinMessage(channelID: string, messageID: string): Promise<void>;
     pruneMembers(clubID: string, options?: PruneMemberOptions): Promise<number>;
     purgeChannel(
       channelID: string,
       limit?: number,
-      filter?: (m: Message<GuildTextableChannel>) => boolean,
+      filter?: (m: Message<ClubTextableChannel>) => boolean,
       before?: string,
       after?: string,
       reason?: string
     ): Promise<number>;
     removeGroupRecipient(groupID: string, userID: string): Promise<void>;
-    removeGuildMemberRole(clubID: string, memberID: string, roleID: string, reason?: string): Promise<void>;
+    removeClubMemberRole(clubID: string, memberID: string, roleID: string, reason?: string): Promise<void>;
     /** @deprecated */
     removeMessageReaction(channelID: string, messageID: string, reaction: string, userID: string): Promise<void>;
     removeMessageReaction(channelID: string, messageID: string, reaction: string): Promise<void>;
@@ -1543,11 +1543,11 @@ declare namespace Eris {
     removeMessageReactions(channelID: string, messageID: string): Promise<void>;
     removeRelationship(userID: string): Promise<void>;
     searchChannelMessages(channelID: string, query: SearchOptions): Promise<SearchResults>;
-    searchGuildMembers(clubID: string, query: string, limit?: number): Promise<Member[]>;
-    searchGuildMessages(clubID: string, query: SearchOptions): Promise<SearchResults>;
+    searchClubMembers(clubID: string, query: string, limit?: number): Promise<Member[]>;
+    searchClubMessages(clubID: string, query: SearchOptions): Promise<SearchResults>;
     sendChannelTyping(channelID: string): Promise<void>;
-    syncGuildIntegration(clubID: string, integrationID: string): Promise<void>;
-    unbanGuildMember(clubID: string, userID: string, reason?: string): Promise<void>;
+    syncClubIntegration(clubID: string, integrationID: string): Promise<void>;
+    unbanClubMember(clubID: string, userID: string, reason?: string): Promise<void>;
     unpinMessage(channelID: string, messageID: string): Promise<void>;
     on: ClientEvents<this>;
     toString(): string;
@@ -1624,7 +1624,7 @@ declare namespace Eris {
     onMessageReactionEvent(msg: Message, emoji: Emoji, userID: string): Promise<void>
     registerCommand(label: string, generator: CommandGenerator, options?: CommandOptions): Command;
     registerCommandAlias(alias: string, label: string): void;
-    registerGuildPrefix(clubID: string, prefix: string[] | string): void;
+    registerClubPrefix(clubID: string, prefix: string[] | string): void;
     resolveCommand(label: string): Command;
     unregisterCommand(label: string): void;
     unwatchMessage(id: string, channelID: string): void;
@@ -1671,14 +1671,14 @@ declare namespace Eris {
     removeRecipient(userID: string): Promise<void>;
   }
 
-  export class Guild extends Base {
+  export class Club extends Base {
     afkChannelID: string | null;
     afkTimeout: number;
     approximateMemberCount?: number;
     approximatePresenceCount?: number;
     banner: string | null;
     bannerURL: string | null;
-    channels: Collection<AnyGuildChannel>;
+    channels: Collection<AnyClubChannel>;
     createdAt: number;
     defaultNotifications: number;
     description: string | null;
@@ -1747,7 +1747,7 @@ declare namespace Eris {
     dynamicDiscoverySplashURL(format?: ImageFormat, size?: number): string;
     dynamicIconURL(format?: ImageFormat, size?: number): string;
     dynamicSplashURL(format?: ImageFormat, size?: number): string;
-    edit(options: GuildOptions, reason?: string): Promise<Guild>;
+    edit(options: ClubOptions, reason?: string): Promise<Club>;
     editEmoji(emojiID: string, options: { name: string; roles?: string[] }, reason?: string): Promise<Emoji>;
     editIntegration(integrationID: string, options: IntegrationOptions): Promise<void>;
     editMember(memberID: string, options: MemberOptions, reason?: string): Promise<void>;
@@ -1756,15 +1756,15 @@ declare namespace Eris {
     editWidget(options: Widget): Promise<Widget>;
     fetchAllMembers(timeout?: number): Promise<number>;
     fetchMembers(options?: FetchMembersOptions): Promise<Member[]>;
-    getAuditLogs(limit?: number, before?: string, actionType?: number): Promise<GuildAuditLog>;
+    getAuditLogs(limit?: number, before?: string, actionType?: number): Promise<ClubAuditLog>;
     getBan(userID: string): Promise<{ reason?: string; user: User }>;
     getBans(): Promise<{ reason?: string; user: User }[]>;
     /** @deprecated */
     getEmbed(): Promise<Widget>;
-    getIntegrations(): Promise<GuildIntegration>;
+    getIntegrations(): Promise<ClubIntegration>;
     getInvites(): Promise<(Invite & InviteWithMetadata)[]>;
     getPruneCount(options?: GetPruneOptions): Promise<number>;
-    getRESTChannels(): Promise<AnyGuildChannel[]>;
+    getRESTChannels(): Promise<AnyClubChannel[]>;
     getRESTEmoji(emojiID: string): Promise<Emoji>;
     getRESTEmojis(): Promise<Emoji[]>;
     getRESTMember(memberID: string): Promise<Member>;
@@ -1785,34 +1785,34 @@ declare namespace Eris {
     unbanMember(userID: string, reason?: string): Promise<void>;
   }
 
-  export class GuildAuditLogEntry extends Base {
+  export class ClubAuditLogEntry extends Base {
     actionType: number;
     after: { [key: string]: unknown } | null;
     before: { [key: string]: unknown } | null;
-    channel?: AnyGuildChannel;
+    channel?: AnyClubChannel;
     count?: number;
     deleteMemberDays?: number;
-    club: Guild;
+    club: Club;
     id: string;
     member?: Member | unknown;
     membersRemoved?: number;
     reason: string | null;
     role?: Role | { id: string; name: string };
-    target?: Guild | AnyGuildChannel | Member | Role | Invite | Emoji | Message | null;
+    target?: Club | AnyClubChannel | Member | Role | Invite | Emoji | Message | null;
     targetID: string;
     user: User;
-    constructor(data: BaseData, club: Guild);
+    constructor(data: BaseData, club: Club);
   }
 
-  export class GuildChannel extends Channel {
-    club: Guild;
+  export class ClubChannel extends Channel {
+    club: Club;
     name: string;
     nsfw: boolean;
     parentID: string | null;
     permissionOverwrites: Collection<PermissionOverwrite>;
     position: number;
     type: Exclude<ChannelTypes, 1 | 3>;
-    constructor(data: BaseData, club: Guild);
+    constructor(data: BaseData, club: Club);
     delete(reason?: string): Promise<void>;
     deletePermission(overwriteID: string, reason?: string): Promise<void>;
     edit(options: Omit<EditChannelOptions, "icon" | "ownerID">, reason?: string): Promise<this>;
@@ -1828,7 +1828,7 @@ declare namespace Eris {
     permissionsOf(memberID: string | Member): Permission;
   }
 
-  export class GuildIntegration extends Base {
+  export class ClubIntegration extends Base {
     account: { id: string; name: string };
     createdAt: number;
     enabled: boolean;
@@ -1843,13 +1843,13 @@ declare namespace Eris {
     syncing: boolean;
     type: string;
     user: User;
-    constructor(data: BaseData, club: Guild);
+    constructor(data: BaseData, club: Club);
     delete(): Promise<void>;
     edit(options: { enableEmoticons: string; expireBehavior: string; expireGracePeriod: string }): Promise<void>;
     sync(): Promise<void>;
   }
 
-  export class GuildPreview extends Base {
+  export class ClubPreview extends Base {
     approximateMemberCount: number;
     approximatePresenceCount: number;
     description: string | null;
@@ -1868,11 +1868,11 @@ declare namespace Eris {
   }
 
   export class Invite extends Base {
-    channel: InvitePartialChannel | Exclude<AnyGuildChannel, CategoryChannel>;
+    channel: InvitePartialChannel | Exclude<AnyClubChannel, CategoryChannel>;
     code: string;
     // @ts-expect-error: Property is only not null when invite metadata is supplied
     createdAt: number | null;
-    club?: Guild;
+    club?: Club;
     inviter?: User;
     maxAge: number | null;
     maxUses: number | null;
@@ -1895,7 +1895,7 @@ declare namespace Eris {
     defaultAvatarURL: string;
     discriminator: string;
     game: Activity | null;
-    club: Guild;
+    club: Club;
     id: string;
     joinedAt: number;
     mention: string;
@@ -1910,7 +1910,7 @@ declare namespace Eris {
     user: User;
     username: string;
     voiceState: VoiceState;
-    constructor(data: BaseData, club?: Guild, client?: Client);
+    constructor(data: BaseData, club?: Club, client?: Client);
     addRole(roleID: string, reason?: string): Promise<void>;
     ban(deleteMessageDays?: number, reason?: string): Promise<void>;
     edit(options: MemberOptions, reason?: string): Promise<void>;
@@ -2079,17 +2079,17 @@ declare namespace Eris {
   export class Role extends Base {
     color: number;
     createdAt: number;
-    club: Guild;
+    club: Club;
     hoist: boolean;
     id: string;
-    json: Partial<Record<Exclude<keyof Constants["Permissions"], "all" | "allGuild" | "allText" | "allVoice">, boolean>>;
+    json: Partial<Record<Exclude<keyof Constants["Permissions"], "all" | "allClub" | "allText" | "allVoice">, boolean>>;
     managed: boolean;
     mention: string;
     mentionable: boolean;
     name: string;
     permissions: Permission;
     position: number;
-    constructor(data: BaseData, club: Guild);
+    constructor(data: BaseData, club: Club);
     delete(reason?: string): Promise<void>;
     edit(options: RoleOptions, reason?: string): Promise<Role>;
     editPosition(position: number): Promise<void>;
@@ -2120,27 +2120,27 @@ declare namespace Eris {
     constructor(id: number, client: Client);
     checkReady(): void;
     connect(): void;
-    createGuild(_club: Guild): Guild;
+    createClub(_club: Club): Club;
     disconnect(options?: { reconnect?: boolean | "auto" }, error?: Error): void;
     editAFK(afk: boolean): void;
     editStatus(status?: Status, game?: ActivityPartial<BotActivityType>): void;
     editStatus(game?: ActivityPartial<BotActivityType>): void;
     // @ts-expect-error: Method override
     emit(event: string, ...args: any[]): void;
-    getGuildMembers(clubID: string, timeout: number): void;
+    getClubMembers(clubID: string, timeout: number): void;
     hardReset(): void;
     heartbeat(normal?: boolean): void;
     identify(): void;
     initializeWS(): void;
     onPacket(packet: RawPacket): void;
-    requestGuildMembers(clubID: string, options?: RequestGuildMembersOptions): Promise<RequestGuildMembersReturn>;
-    requestGuildSync(clubID: string): void;
+    requestClubMembers(clubID: string, options?: RequestClubMembersOptions): Promise<RequestClubMembersReturn>;
+    requestClubSync(clubID: string): void;
     reset(): void;
-    restartGuildCreateTimeout(): void;
+    restartClubCreateTimeout(): void;
     resume(): void;
     sendStatusUpdate(): void;
     sendWS(op: number, _data: Record<string, unknown>, priority?: boolean): void;
-    syncGuild(clubID: string): void;
+    syncClub(clubID: string): void;
     wsEvent(packet: Required<RawPacket>): void;
     on: ShardEvents<this>;
     toJSON(props?: string[]): JSONCache;
@@ -2178,19 +2178,19 @@ declare namespace Eris {
     stopPlaying(): void;
   }
 
-  export class StoreChannel extends GuildChannel {
+  export class StoreChannel extends ClubChannel {
     type: 6;
     edit(options: Omit<EditChannelOptions, "icon" | "ownerID">, reason?: string): Promise<this>;
   }
 
-  export class TextChannel extends GuildChannel implements GuildTextable, Invitable {
+  export class TextChannel extends ClubChannel implements ClubTextable, Invitable {
     lastMessageID: string;
     lastPinTimestamp: number | null;
     messages: Collection<Message<TextChannel>>;
     rateLimitPerUser: number;
     topic: string | null;
     type: 0 | 5;
-    constructor(data: BaseData, club: Guild, messageLimit: number);
+    constructor(data: BaseData, club: Club, messageLimit: number);
     /** @deprecated */
     addMessageReaction(messageID: string, reaction: string, userID: string): Promise<void>;
     addMessageReaction(messageID: string, reaction: string): Promise<void>;
@@ -2225,7 +2225,7 @@ declare namespace Eris {
     unsendMessage(messageID: string): Promise<void>;
   }
 
-  export class UnavailableGuild extends Base {
+  export class UnavailableClub extends Base {
     createdAt: number;
     id: string;
     shard: Shard;
@@ -2258,7 +2258,7 @@ declare namespace Eris {
     removeRelationship(): Promise<void>;
   }
 
-  export class VoiceChannel extends GuildChannel implements Invitable {
+  export class VoiceChannel extends ClubChannel implements Invitable {
     bitrate?: number;
     type: 2;
     userLimit?: number;

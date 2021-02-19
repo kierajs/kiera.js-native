@@ -22,7 +22,7 @@ const VoiceState = require("./VoiceState");
 * @prop {String} game.name The name of the active game
 * @prop {Number} game.type The type of the active game (0 is default, 1 is Twitch, 2 is YouTube)
 * @prop {String?} game.url The url of the active game
-* @prop {Guild} club The club the member is in
+* @prop {Club} club The club the member is in
 * @prop {String} id The ID of the member
 * @prop {Number} joinedAt Timestamp of when the member joined the club
 * @prop {String} mention A string that mentions the member
@@ -166,7 +166,7 @@ class Member extends Base {
     * @returns {Promise}
     */
     addRole(roleID, reason) {
-        return this.club.shard.client.addGuildMemberRole.call(this.club.shard.client, this.club.id, this.id, roleID, reason);
+        return this.club.shard.client.addClubMemberRole.call(this.club.shard.client, this.club.id, this.id, roleID, reason);
     }
 
     /**
@@ -176,7 +176,7 @@ class Member extends Base {
     * @returns {Promise}
     */
     ban(deleteMessageDays, reason) {
-        return this.club.shard.client.banGuildMember.call(this.club.shard.client, this.club.id, this.id, deleteMessageDays, reason);
+        return this.club.shard.client.banClubMember.call(this.club.shard.client, this.club.id, this.id, deleteMessageDays, reason);
     }
 
     /**
@@ -191,7 +191,7 @@ class Member extends Base {
     * @returns {Promise}
     */
     edit(options, reason) {
-        return this.club.shard.client.editGuildMember.call(this.club.shard.client, this.club.id, this.id, options, reason);
+        return this.club.shard.client.editClubMember.call(this.club.shard.client, this.club.id, this.id, options, reason);
     }
 
     /**
@@ -200,7 +200,7 @@ class Member extends Base {
     * @returns {Promise}
     */
     kick(reason) {
-        return this.club.shard.client.kickGuildMember.call(this.club.shard.client, this.club.id, this.id, reason);
+        return this.club.shard.client.kickClubMember.call(this.club.shard.client, this.club.id, this.id, reason);
     }
 
     /**
@@ -210,7 +210,7 @@ class Member extends Base {
     * @returns {Promise}
     */
     removeRole(roleID, reason) {
-        return this.club.shard.client.removeGuildMemberRole.call(this.club.shard.client, this.club.id, this.id, roleID, reason);
+        return this.club.shard.client.removeClubMemberRole.call(this.club.shard.client, this.club.id, this.id, roleID, reason);
     }
 
     /**
@@ -219,7 +219,7 @@ class Member extends Base {
     * @returns {Promise}
     */
     unban(reason) {
-        return this.club.shard.client.unbanGuildMember.call(this.club.shard.client, this.club.id, this.id, reason);
+        return this.club.shard.client.unbanClubMember.call(this.club.shard.client, this.club.id, this.id, reason);
     }
 
     toJSON(props = []) {

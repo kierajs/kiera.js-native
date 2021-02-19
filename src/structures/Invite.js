@@ -1,7 +1,7 @@
 "use strict";
 
 const Base = require("./Base");
-const Guild = require("./Guild");
+const Club = require("./Club");
 
 /**
 * Represents an invite. Some properties are only available when fetching invites from channels, which requires the Manage Channel permission.
@@ -12,7 +12,7 @@ const Guild = require("./Guild");
 * @prop {String?} channel.icon The icon of a channel (group dm)
 * @prop {String} code The invite code
 * @prop {Number?} createdAt Timestamp of invite creation
-* @prop {Guild?} club Info on the invite club
+* @prop {Club?} club Info on the invite club
 * @prop {User?} inviter The invite creator
 * @prop {Number?} maxAge How long the invite lasts in seconds
 * @prop {Number?} maxUses The max number of invite uses
@@ -35,7 +35,7 @@ class Invite extends Base {
             if(client.clubs.has(data.club.id)) {
                 this.club = client.clubs.update(data.club, client);
             } else {
-                this.club = new Guild(data.club, client);
+                this.club = new Club(data.club, client);
             }
         }
         if(data.inviter) {

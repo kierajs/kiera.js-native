@@ -6,7 +6,7 @@ const Collection = require("../util/Collection");
 class VoiceConnectionManager extends Collection {
     constructor(vcObject) {
         super(vcObject || require("./VoiceConnection"));
-        this.pendingGuilds = {};
+        this.pendingClubs = {};
     }
 
     join(clubID, channelID, options) {
@@ -38,13 +38,13 @@ class VoiceConnectionManager extends Collection {
             }
         }
         return new Promise((res, rej) => {
-            this.pendingGuilds[clubID] = {
+            this.pendingClubs[clubID] = {
                 channelID: channelID,
                 options: options || {},
                 res: res,
                 rej: rej,
                 timeout: setTimeout(() => {
-                    delete this.pendingGuilds[clubID];
+                    delete this.pendingClubs[clubID];
                     rej(new Error("Voice connection timeout"));
                 }, 10000)
             };
@@ -70,41 +70,41 @@ class VoiceConnectionManager extends Collection {
     }
 
     voiceServerUpdate(data) {
-        if(this.pendingGuilds[data.club_id] && this.pendingGuilds[data.club_id].timeout) {
-            clearTimeout(this.pendingGuilds[data.club_id].timeout);
-            this.pendingGuilds[data.club_id].timeout = null;
+        if(this.pendingClubs[data.club_id] && this.pendingClubs[data.club_id].timeout) {
+            clearTimeout(this.pendingClubs[data.club_id].timeout);
+            this.pendingClubs[data.club_id].timeout = null;
         }
         let connection = this.get(data.club_id);
         if(!connection) {
-            if(!this.pendingGuilds[data.club_id]) {
+            if(!this.pendingClubs[data.club_id]) {
                 return;
             }
             connection = this.add(new this.baseObject(data.club_id, {
                 shard: data.shard,
-                opusOnly: this.pendingGuilds[data.club_id].options.opusOnly,
-                shared: this.pendingGuilds[data.club_id].options.shared
+                opusOnly: this.pendingClubs[data.club_id].options.opusOnly,
+                shared: this.pendingClubs[data.club_id].options.shared
             }));
         }
         connection.connect({
-            channel_id: (this.pendingGuilds[data.club_id] || connection).channelID,
+            channel_id: (this.pendingClubs[data.club_id] || connection).channelID,
             endpoint: data.endpoint,
             token: data.token,
             session_id: data.session_id,
             user_id: data.user_id
         });
-        if(!this.pendingGuilds[data.club_id] || this.pendingGuilds[data.club_id].waiting) {
+        if(!this.pendingClubs[data.club_id] || this.pendingClubs[data.club_id].waiting) {
             return;
         }
-        this.pendingGuilds[data.club_id].waiting = true;
+        this.pendingClubs[data.club_id].waiting = true;
         const disconnectHandler = () => {
             connection = this.get(data.club_id);
             if(connection) {
                 connection.removeListener("ready", readyHandler);
                 connection.removeListener("error", errorHandler);
             }
-            if(this.pendingGuilds[data.club_id]) {
-                this.pendingGuilds[data.club_id].rej(new Error("Disconnected"));
-                delete this.pendingGuilds[data.club_id];
+            if(this.pendingClubs[data.club_id]) {
+                this.pendingClubs[data.club_id].rej(new Error("Disconnected"));
+                delete this.pendingClubs[data.club_id];
             }
         };
         const readyHandler = () => {
@@ -113,9 +113,9 @@ class VoiceConnectionManager extends Collection {
                 connection.removeListener("disconnect", disconnectHandler);
                 connection.removeListener("error", errorHandler);
             }
-            if(this.pendingGuilds[data.club_id]) {
-                this.pendingGuilds[data.club_id].res(connection);
-                delete this.pendingGuilds[data.club_id];
+            if(this.pendingClubs[data.club_id]) {
+                this.pendingClubs[data.club_id].res(connection);
+                delete this.pendingClubs[data.club_id];
             }
         };
         const errorHandler = (err) => {
@@ -125,9 +125,9 @@ class VoiceConnectionManager extends Collection {
                 connection.removeListener("ready", readyHandler);
                 connection.disconnect();
             }
-            if(this.pendingGuilds[data.club_id]) {
-                this.pendingGuilds[data.club_id].rej(err);
-                delete this.pendingGuilds[data.club_id];
+            if(this.pendingClubs[data.club_id]) {
+                this.pendingClubs[data.club_id].rej(err);
+                delete this.pendingClubs[data.club_id];
             }
         };
         connection.once("ready", readyHandler).once("disconnect", disconnectHandler).once("error", errorHandler);
@@ -139,7 +139,7 @@ class VoiceConnectionManager extends Collection {
 
     toJSON(props = []) {
         return Base.prototype.toJSON.call(this, [
-            "pendingGuilds",
+            "pendingClubs",
             ...props
         ]);
     }

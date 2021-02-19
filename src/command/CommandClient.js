@@ -387,7 +387,7 @@ class CommandClient extends Client {
     * @arg {String} clubID The ID of the club to override prefixes for
     * @arg {String | Array} prefix The bot prefix. Can be either an array of prefixes or a single prefix. "@mention" will be automatically replaced with the bot's actual mention
     */
-    registerGuildPrefix(clubID, prefix) {
+    registerClubPrefix(clubID, prefix) {
         if(!this.preReady) {
             this.clubPrefixes[clubID] = prefix;
         } else if(Array.isArray(prefix)) {

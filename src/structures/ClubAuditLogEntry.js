@@ -14,15 +14,15 @@ const {AuditLogActions} = require("../Constants");
 * @prop {(CategoryChannel | TextChannel | VoiceChannel)?} channel The channel containing the deleted messages, action type 72 (MESSAGE_DELETE) only
 * @prop {Number?} count The number of messages deleted, action type 72 (MESSAGE_DELETE) only
 * @prop {Number?} deleteMemberDays The number of days of inactivity to prune for, action type 21 (MEMBER_PRUNE) only
-* @prop {Guild} club The club containing the entry
+* @prop {Club} club The club containing the entry
 * @prop {String} id The ID of the entry
 * @prop {(Member | Object)?} member The member described by the permission overwrite, action types 13-15 (CHANNEL\_OVERWRITE\_CREATE/UPDATE/DELETE) only. If the member is not cached, this could be {id: String}
 * @prop {Number?} membersRemoved The number of members pruned from the server, action type 21 (MEMBER_PRUNE) only
 * @prop {String?} reason The reason for the action
 * @prop {(Role | Object)?} role The role described by the permission overwrite, action types 13-15 (CHANNEL\_OVERWRITE\_CREATE/UPDATE/DELETE) only. If the role is not cached, this could be {id: String, name: String}
-* @prop {(CategoryChannel | Guild | Member | Invite | Role | Object | TextChannel | VoiceChannel | NewsChannel)?} target The object of the action target
+* @prop {(CategoryChannel | Club | Member | Invite | Role | Object | TextChannel | VoiceChannel | NewsChannel)?} target The object of the action target
 * If the item is not cached, this property will be null
-* If the action targets a club, this could be a Guild object
+* If the action targets a club, this could be a Club object
 * If the action targets a club channel, this could be a CategoryChannel, TextChannel, or VoiceChannel object
 * If the action targets a member, this could be a Member object
 * If the action targets a role, this could be a Role object
@@ -33,7 +33,7 @@ const {AuditLogActions} = require("../Constants");
 * @prop {String} targetID The ID of the action target
 * @prop {User} user The user that performed the action
 */
-class GuildAuditLogEntry extends Base {
+class ClubAuditLogEntry extends Base {
     constructor(data, club) {
         super(data.id);
         this.club = club;
@@ -86,7 +86,7 @@ class GuildAuditLogEntry extends Base {
     }
 
     get target() { // pay more, get less
-        if(this.actionType < 10) { // Guild
+        if(this.actionType < 10) { // Club
             return this.club;
         } else if(this.actionType < 20) { // Channel
             return this.club && this.club.channels.get(this.targetID);
@@ -140,4 +140,4 @@ class GuildAuditLogEntry extends Base {
     }
 }
 
-module.exports = GuildAuditLogEntry;
+module.exports = ClubAuditLogEntry;

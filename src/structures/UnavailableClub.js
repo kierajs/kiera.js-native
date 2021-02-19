@@ -8,7 +8,7 @@ const Base = require("./Base");
 * @prop {Boolean} unavailable Whether the club is unavailable or not
 * @prop {Shard} shard The Shard that owns the club
 */
-class UnavailableGuild extends Base {
+class UnavailableClub extends Base {
     constructor(data, client) {
         super(data.id);
         this.shard = client.shards.get(client.clubShardMap[this.id]);
@@ -23,4 +23,4 @@ class UnavailableGuild extends Base {
     }
 }
 
-module.exports = UnavailableGuild;
+module.exports = UnavailableClub;

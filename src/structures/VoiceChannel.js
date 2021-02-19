@@ -1,18 +1,18 @@
 "use strict";
 
 const Collection = require("../util/Collection");
-const GuildChannel = require("./ClubChannel");
+const ClubChannel = require("./ClubChannel");
 const Member = require("./Member");
 
 /**
-* Represents a club voice channel. See GuildChannel for more properties and methods.
-* @extends GuildChannel
+* Represents a club voice channel. See ClubChannel for more properties and methods.
+* @extends ClubChannel
 * @prop {Number?} bitrate The bitrate of the channel
 * @prop {Number} type The type of the channel
 * @prop {Number?} userLimit The max number of users that can join the channel
 * @prop {Collection<Member>} voiceMembers Collection of Members in this channel
 */
-class VoiceChannel extends GuildChannel {
+class VoiceChannel extends ClubChannel {
     constructor(data, client) {
         super(data, client);
         this.voiceMembers = new Collection(Member);

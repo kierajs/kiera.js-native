@@ -5,7 +5,7 @@ const Bucket = require("../util/Bucket");
 const Call = require("../structures/Call");
 const Channel = require("../structures/Channel");
 const GroupChannel = require("../structures/GroupChannel");
-const GuildChannel = require("../structures/GuildChannel");
+const ClubChannel = require("../structures/ClubChannel");
 const PrivateChannel = require("../structures/PrivateChannel");
 const {GATEWAY_VERSION, GatewayOPCodes, ChannelTypes} = require("../Constants");
 const ExtendedUser = require("../structures/ExtendedUser");
@@ -70,16 +70,16 @@ class Shard extends EventEmitter {
     checkReady() {
         if(!this.ready) {
             if(this.clubSyncQueue.length > 0) {
-                this.requestGuildSync(this.clubSyncQueue);
+                this.requestClubSync(this.clubSyncQueue);
                 this.clubSyncQueue = [];
                 this.clubSyncQueueLength = 1;
                 return;
             }
-            if(this.unsyncedGuilds > 0) {
+            if(this.unsyncedClubs > 0) {
                 return;
             }
             if(this.getAllUsersQueue.length > 0) {
-                this.requestGuildMembers(this.getAllUsersQueue);
+                this.requestClubMembers(this.getAllUsersQueue);
                 this.getAllUsersQueue = [];
                 this.getAllUsersLength = 1;
                 return;
@@ -108,15 +108,15 @@ class Shard extends EventEmitter {
         return this.initializeWS();
     }
 
-    createGuild(_club) {
+    createClub(_club) {
         this.client.clubShardMap[_club.id] = this.id;
         const club = this.client.clubs.add(_club, this.client, true);
         if(this.client.bot === false) {
-            ++this.unsyncedGuilds;
-            this.syncGuild(club.id);
+            ++this.unsyncedClubs;
+            this.syncClub(club.id);
         }
         if(this.client.options.getAllUsers && club.members.size < club.memberCount) {
-            this.getGuildMembers(club.id);
+            this.getClubMembers(club.id);
         }
         return club;
     }
@@ -242,7 +242,7 @@ class Shard extends EventEmitter {
         }
     }
 
-    getGuildMembers(clubID, timeout) {
+    getClubMembers(clubID, timeout) {
         if(this.getAllUsersCount.hasOwnProperty(clubID)) {
             throw new Error("Cannot request all members while an existing request is processing");
         }
@@ -252,10 +252,10 @@ class Shard extends EventEmitter {
             if(!(this.client.options.intents & Constants.Intents.clubMembers)) {
                 throw new Error("Cannot request all members without clubMembers intent");
             }
-            this.requestGuildMembers([clubID], timeout);
+            this.requestClubMembers([clubID], timeout);
         } else {
             if(this.getAllUsersLength + 3 + clubID.length > 4048) { // 4096 - "{\"op\":8,\"d\":{\"club_id\":[],\"query\":\"\",\"limit\":0}}".length + 1 for lazy comma offset
-                this.requestGuildMembers(this.getAllUsersQueue);
+                this.requestClubMembers(this.getAllUsersQueue);
                 this.getAllUsersQueue = [clubID];
                 this.getAllUsersLength = 1 + clubID.length + 3;
             } else {
@@ -460,7 +460,7 @@ class Shard extends EventEmitter {
         }
     }
 
-    requestGuildMembers(clubID, options) {
+    requestClubMembers(clubID, options) {
         const opts = {
             club_id: clubID,
             limit: (options && options.limit) || 0,
@@ -490,7 +490,7 @@ class Shard extends EventEmitter {
         });
     }
 
-    requestGuildSync(clubID) {
+    requestClubSync(clubID) {
         this.sendWS(GatewayOPCodes.SYNC_CLUB, clubID);
     }
 
@@ -513,7 +513,7 @@ class Shard extends EventEmitter {
         this.getAllUsersLength = 1;
         this.clubSyncQueue = [];
         this.clubSyncQueueLength = 1;
-        this.unsyncedGuilds = 0;
+        this.unsyncedClubs = 0;
         this.latency = Infinity;
         this.lastHeartbeatAck = true;
         this.lastHeartbeatReceived = null;
@@ -525,13 +525,13 @@ class Shard extends EventEmitter {
         this.connectTimeout = null;
     }
 
-    restartGuildCreateTimeout() {
+    restartClubCreateTimeout() {
         if(this.clubCreateTimeout) {
             clearTimeout(this.clubCreateTimeout);
             this.clubCreateTimeout = null;
         }
         if(!this.ready) {
-            if(this.client.unavailableGuilds.size === 0 && this.unsyncedGuilds === 0) {
+            if(this.client.unavailableClubs.size === 0 && this.unsyncedClubs === 0) {
                 return this.checkReady();
             }
             this.clubCreateTimeout = setTimeout(() => {
@@ -580,13 +580,13 @@ class Shard extends EventEmitter {
         }
     }
 
-    syncGuild(clubID) {
+    syncClub(clubID) {
         if(this.clubSyncQueueLength + 3 + clubID.length > 4081) { // 4096 - "{\"op\":12,\"d\":[]}".length + 1 for lazy comma offset
-            this.requestGuildSync(this.clubSyncQueue);
+            this.requestClubSync(this.clubSyncQueue);
             this.clubSyncQueue = [clubID];
             this.clubSyncQueueLength = 1 + clubID.length + 3;
         } else if(this.ready) {
-            this.requestGuildSync([clubID]);
+            this.requestClubSync([clubID]);
         } else {
             this.clubSyncQueue.push(clubID);
             this.clubSyncQueueLength += clubID.length + 3;
@@ -1066,7 +1066,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a member joins a server
                 * @event Client#clubMemberAdd
-                * @prop {Guild} club The club
+                * @prop {Club} club The club
                 * @prop {Member} member The member
                 */
                 this.emit("clubMemberAdd", club, club.members.add(packet.d, club));
@@ -1116,7 +1116,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a member's roles or nickname are updated or they start boosting a server
                 * @event Client#clubMemberUpdate
-                * @prop {Guild} club The club
+                * @prop {Club} club The club
                 * @prop {Member} member The updated member
                 * @prop {Object?} oldMember The old member data
                 * @prop {Array<String>} oldMember.roles An array of role IDs this member is a part of
@@ -1139,7 +1139,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a member leaves a server
                 * @event Client#clubMemberRemove
-                * @prop {Guild} club The club
+                * @prop {Club} club The club
                 * @prop {Member | Object} member The member. If the member is not cached, this will be an object with `id` and `user` key
                 */
                 this.emit("clubMemberRemove", club, club.members.remove(packet.d) || {
@@ -1150,13 +1150,13 @@ class Shard extends EventEmitter {
             }
             case "CLUB_CREATE": {
                 if(!packet.d.unavailable) {
-                    const club = this.createGuild(packet.d);
+                    const club = this.createClub(packet.d);
                     if(this.ready) {
-                        if(this.client.unavailableGuilds.remove(packet.d)) {
+                        if(this.client.unavailableClubs.remove(packet.d)) {
                             /**
                             * Fired when a club becomes available
                             * @event Client#clubAvailable
-                            * @prop {Guild} club The club
+                            * @prop {Club} club The club
                             */
                             this.emit("clubAvailable", club);
                         } else {
@@ -1165,32 +1165,32 @@ class Shard extends EventEmitter {
                             * - the client creates a club
                             * - the client joins a club
                             * @event Client#clubCreate
-                            * @prop {Guild} club The club
+                            * @prop {Club} club The club
                             */
                             this.emit("clubCreate", club);
                         }
                     } else {
-                        this.client.unavailableGuilds.remove(packet.d);
-                        this.restartGuildCreateTimeout();
+                        this.client.unavailableClubs.remove(packet.d);
+                        this.restartClubCreateTimeout();
                     }
                 } else {
                     this.client.clubs.remove(packet.d);
                     /**
                     * Fired when an unavailable club is created
-                    * @event Client#unavailableGuildCreate
-                    * @prop {UnavailableGuild} club The unavailable club
+                    * @event Client#unavailableClubCreate
+                    * @prop {UnavailableClub} club The unavailable club
                     */
-                    this.emit("unavailableGuildCreate", this.client.unavailableGuilds.add(packet.d, this.client));
+                    this.emit("unavailableClubCreate", this.client.unavailableClubs.add(packet.d, this.client));
                 }
                 break;
             }
             case "CLUB_UPDATE": {
                 const club = this.client.clubs.get(packet.d.id);
                 if(!club) {
-                    this.emit("debug", `Guild ${packet.d.id} undefined in CLUB_UPDATE`);
+                    this.emit("debug", `Club ${packet.d.id} undefined in CLUB_UPDATE`);
                     break;
                 }
-                const oldGuild = {
+                const oldClub = {
                     afkChannelID: club.afkChannelID,
                     afkTimeout: club.afkTimeout,
                     banner: club.banner,
@@ -1216,31 +1216,31 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a club is updated
                 * @event Client#clubUpdate
-                * @prop {Guild} club The club
-                * @prop {Object} oldGuild The old club data
-                * @prop {String} oldGuild.afkChannelID The ID of the AFK voice channel
-                * @prop {Number} oldGuild.afkTimeout The AFK timeout in seconds
-                * @prop {String?} oldGuild.banner The hash of the club banner image, or null if no splash (VIP only)
-                * @prop {Number} oldGuild.defaultNotifications The default notification settings for the club. 0 is "All Messages", 1 is "Only @mentions"
-                * @prop {String?} oldGuild.description The description for the club (VIP only)
-                * @prop {Array<Object>} oldGuild.emojis An array of club emojis
-                * @prop {Number} oldGuild.explicitContentFilter The explicit content filter level for the club. 0 is off, 1 is on for people without roles, 2 is on for all
-                * @prop {Array<Object>} oldGuild.features An array of club features
-                * @prop {String?} oldGuild.icon The hash of the club icon, or null if no icon
-                * @prop {Boolean} oldGuild.large Whether the club is "large" by "some Helselia standard"
-                * @prop {Number} oldGuild.maxPresences The maximum number of people that can be online in a club at once (returned from REST API only)
-                * @prop {Number} oldGuild.mfaLevel The admin 2FA level for the club. 0 is not required, 1 is required
-                * @prop {String} oldGuild.name The name of the club
-                * @prop {String} oldGuild.ownerID The ID of the user that is the club owner
-                * @prop {String} oldGuild.preferredLocale Preferred "PUBLIC" club language used in server discovery and notices from Helselia
-                * @prop {String?} oldGuild.publicUpdatesChannelID ID of the club's updates channel if the club has "PUBLIC" features
-                * @prop {String} oldGuild.region The region of the club
-                * @prop {String?} oldGuild.rulesChannelID The channel where "PUBLIC" clubs display rules and/or guidelines
-                * @prop {String?} oldGuild.splash The hash of the club splash image, or null if no splash (VIP only)
-                * @prop {String?} oldGuild.systemChannelID The ID of the default channel for system messages (built-in join messages and boost messages)
-                * @prop {Number} oldGuild.verificationLevel The club verification level
+                * @prop {Club} club The club
+                * @prop {Object} oldClub The old club data
+                * @prop {String} oldClub.afkChannelID The ID of the AFK voice channel
+                * @prop {Number} oldClub.afkTimeout The AFK timeout in seconds
+                * @prop {String?} oldClub.banner The hash of the club banner image, or null if no splash (VIP only)
+                * @prop {Number} oldClub.defaultNotifications The default notification settings for the club. 0 is "All Messages", 1 is "Only @mentions"
+                * @prop {String?} oldClub.description The description for the club (VIP only)
+                * @prop {Array<Object>} oldClub.emojis An array of club emojis
+                * @prop {Number} oldClub.explicitContentFilter The explicit content filter level for the club. 0 is off, 1 is on for people without roles, 2 is on for all
+                * @prop {Array<Object>} oldClub.features An array of club features
+                * @prop {String?} oldClub.icon The hash of the club icon, or null if no icon
+                * @prop {Boolean} oldClub.large Whether the club is "large" by "some Helselia standard"
+                * @prop {Number} oldClub.maxPresences The maximum number of people that can be online in a club at once (returned from REST API only)
+                * @prop {Number} oldClub.mfaLevel The admin 2FA level for the club. 0 is not required, 1 is required
+                * @prop {String} oldClub.name The name of the club
+                * @prop {String} oldClub.ownerID The ID of the user that is the club owner
+                * @prop {String} oldClub.preferredLocale Preferred "PUBLIC" club language used in server discovery and notices from Helselia
+                * @prop {String?} oldClub.publicUpdatesChannelID ID of the club's updates channel if the club has "PUBLIC" features
+                * @prop {String} oldClub.region The region of the club
+                * @prop {String?} oldClub.rulesChannelID The channel where "PUBLIC" clubs display rules and/or guidelines
+                * @prop {String?} oldClub.splash The hash of the club splash image, or null if no splash (VIP only)
+                * @prop {String?} oldClub.systemChannelID The ID of the default channel for system messages (built-in join messages and boost messages)
+                * @prop {Number} oldClub.verificationLevel The club verification level
                 */
-                this.emit("clubUpdate", this.client.clubs.update(packet.d, this.client), oldGuild);
+                this.emit("clubUpdate", this.client.clubs.update(packet.d, this.client), oldClub);
                 break;
             }
             case "CLUB_DELETE": {
@@ -1257,16 +1257,16 @@ class Shard extends EventEmitter {
                 const club = this.client.clubs.remove(packet.d);
                 if(club) { // Helselia sends CLUB_DELETE for clubs that were previously unavailable in READY
                     club.channels.forEach((channel) => {
-                        delete this.client.channelGuildMap[channel.id];
+                        delete this.client.channelClubMap[channel.id];
                     });
                 }
                 if(packet.d.unavailable) {
                     /**
                     * Fired when a club becomes unavailable
                     * @event Client#clubUnavailable
-                    * @prop {Guild} club The club
+                    * @prop {Club} club The club
                     */
-                    this.emit("clubUnavailable", this.client.unavailableGuilds.add(packet.d, this.client));
+                    this.emit("clubUnavailable", this.client.unavailableClubs.add(packet.d, this.client));
                 } else {
                     /**
                     * Fired when a club is deleted. This happens when:
@@ -1274,7 +1274,7 @@ class Shard extends EventEmitter {
                     * - the client was kicked/banned from the club
                     * - the club was literally deleted
                     * @event Client#clubDelete
-                    * @prop {Guild | Object} club The club. If the club was not cached, it will be an object with an `id` key. No other property is guaranteed
+                    * @prop {Club | Object} club The club. If the club was not cached, it will be an object with an `id` key. No other property is guaranteed
                     */
                     this.emit("clubDelete", club || {
                         id: packet.d.id
@@ -1286,7 +1286,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a user is banned from a club
                 * @event Client#clubBanAdd
-                * @prop {Guild} club The club
+                * @prop {Club} club The club
                 * @prop {User} user The banned user
                 */
                 this.emit("clubBanAdd", this.client.clubs.get(packet.d.club_id), this.client.users.update(packet.d.user, this.client));
@@ -1296,7 +1296,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a user is unbanned from a club
                 * @event Client#clubBanRemove
-                * @prop {Guild} club The club
+                * @prop {Club} club The club
                 * @prop {User} user The banned user
                 */
                 this.emit("clubBanRemove", this.client.clubs.get(packet.d.club_id), this.client.users.update(packet.d.user, this.client));
@@ -1306,7 +1306,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a club role is created
                 * @event Client#clubRoleCreate
-                * @prop {Guild} club The club
+                * @prop {Club} club The club
                 * @prop {Role} role The role
                 */
                 const club = this.client.clubs.get(packet.d.club_id);
@@ -1320,7 +1320,7 @@ class Shard extends EventEmitter {
             case "CLUB_ROLE_UPDATE": {
                 const club = this.client.clubs.get(packet.d.club_id);
                 if(!club) {
-                    this.emit("debug", `Guild ${packet.d.club_id} undefined in CLUB_ROLE_UPDATE`);
+                    this.emit("debug", `Club ${packet.d.club_id} undefined in CLUB_ROLE_UPDATE`);
                     break;
                 }
                 const role = club.roles.add(packet.d.role, club);
@@ -1340,7 +1340,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a club role is updated
                 * @event Client#clubRoleUpdate
-                * @prop {Guild} club The club
+                * @prop {Club} club The club
                 * @prop {Role} role The updated role
                 * @prop {Object} oldRole The old role data
                 * @prop {Number} oldRole.color The hex color of the role in base 10
@@ -1358,7 +1358,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a club role is deleted
                 * @event Client#clubRoleDelete
-                * @prop {Guild} club The club
+                * @prop {Club} club The club
                 * @prop {Role} role The role
                 */
                 const club = this.client.clubs.get(packet.d.club_id);
@@ -1387,7 +1387,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a club invite is created
                 * @event Client#inviteCreate
-                * @prop {Guild} club The club this invite was created in.
+                * @prop {Club} club The club this invite was created in.
                 * @prop {Invite} invite The invite that was created
                 */
                 this.emit("inviteCreate", club, new Invite({
@@ -1411,7 +1411,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a club invite is deleted
                 * @event Client#inviteDelete
-                * @prop {Guild} club The club this invite was created in.
+                * @prop {Club} club The club this invite was created in.
                 * @prop {Invite} invite The invite that was deleted
                 */
                 this.emit("inviteDelete", club, new Invite({
@@ -1432,11 +1432,11 @@ class Shard extends EventEmitter {
                         }
                     }
                     channel.club.channels.add(channel, this.client);
-                    this.client.channelGuildMap[packet.d.id] = packet.d.club_id;
+                    this.client.channelClubMap[packet.d.id] = packet.d.club_id;
                     /**
                     * Fired when a channel is created
                     * @event Client#channelCreate
-                    * @prop {TextChannel | VoiceChannel | CategoryChannel | StoreChannel | NewsChannel | GuildChannel | PrivateChannel} channel The channel
+                    * @prop {TextChannel | VoiceChannel | CategoryChannel | StoreChannel | NewsChannel | ClubChannel | PrivateChannel} channel The channel
                     */
                     this.emit("channelCreate", channel);
                 } else if(channel instanceof PrivateChannel) {
@@ -1467,7 +1467,7 @@ class Shard extends EventEmitter {
                         ownerID: channel.ownerID,
                         icon: channel.icon
                     };
-                } else if(channel instanceof GuildChannel) {
+                } else if(channel instanceof ClubChannel) {
                     oldChannel = {
                         bitrate: channel.bitrate,
                         name: channel.name,
@@ -1515,7 +1515,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a channel is updated
                 * @event Client#channelUpdate
-                * @prop {TextChannel | VoiceChannel | CategoryChannel | StoreChannel | NewsChannel | GuildChannel | PrivateChannel} channel The updated channel
+                * @prop {TextChannel | VoiceChannel | CategoryChannel | StoreChannel | NewsChannel | ClubChannel | PrivateChannel} channel The updated channel
                 * @prop {Object} oldChannel The old channel data
                 * @prop {Number?} oldChannel.bitrate The bitrate of the channel (voice channels only)
                 * @prop {String} oldChannel.name The name of the channel
@@ -1546,7 +1546,7 @@ class Shard extends EventEmitter {
                         }
                     }
                 } else if(packet.d.club_id) {
-                    delete this.client.channelGuildMap[packet.d.id];
+                    delete this.client.channelClubMap[packet.d.id];
                     const club = this.client.clubs.get(packet.d.club_id);
                     if(!club) {
                         this.emit("debug", `Missing club ${packet.d.club_id} in CHANNEL_DELETE`);
@@ -1695,7 +1695,7 @@ class Shard extends EventEmitter {
             case "CLUB_MEMBERS_CHUNK": {
                 const club = this.client.clubs.get(packet.d.club_id);
                 if(!club) {
-                    this.emit("debug", `Received CLUB_MEMBERS_CHUNK, but club ${packet.d.club_id} is ` + (this.client.unavailableGuilds.has(packet.d.club_id) ? "unavailable" : "missing"), this.id);
+                    this.emit("debug", `Received CLUB_MEMBERS_CHUNK, but club ${packet.d.club_id} is ` + (this.client.unavailableClubs.has(packet.d.club_id) ? "unavailable" : "missing"), this.id);
                     break;
                 }
 
@@ -1732,7 +1732,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when Helselia sends member chunks
                 * @event Client#clubMemberChunk
-                * @prop {Guild} club The club the chunked members are in
+                * @prop {Club} club The club the chunked members are in
                 * @prop {Array<Member>} members The members in the chunk
                 */
                 this.emit("clubMemberChunk", club, members);
@@ -1772,12 +1772,12 @@ class Shard extends EventEmitter {
                                 this.client.joinVoiceChannel(channel.id);
                             }
                         } else { // Phantom voice states from connected users in deleted channels (╯°□°）╯︵ ┻━┻
-                            this.client.emit("debug", "Phantom voice state received but channel not found | Guild: " + club.id + " | Channel: " + voiceState.channel_id);
+                            this.client.emit("debug", "Phantom voice state received but channel not found | Club: " + club.id + " | Channel: " + voiceState.channel_id);
                         }
                     }
                 }
                 club.pendingVoiceStates = null;
-                --this.unsyncedGuilds;
+                --this.unsyncedClubs;
                 this.checkReady();
                 break;
             }
@@ -1818,9 +1818,9 @@ class Shard extends EventEmitter {
                     }
                 } else {
                     this.client.bot = false;
-                    this.client.userGuildSettings = {};
+                    this.client.userClubSettings = {};
                     packet.d.user_club_settings.forEach((clubSettings) => {
-                        this.client.userGuildSettings[clubSettings.club_id] = clubSettings;
+                        this.client.userClubSettings[clubSettings.club_id] = clubSettings;
                     });
                     this.client.userSettings = packet.d.user_settings;
                 }
@@ -1834,9 +1834,9 @@ class Shard extends EventEmitter {
                 packet.d.clubs.forEach((club) => {
                     if(club.unavailable) {
                         this.client.clubs.remove(club);
-                        this.client.unavailableGuilds.add(club, this.client, true);
+                        this.client.unavailableClubs.add(club, this.client, true);
                     } else {
-                        this.client.unavailableGuilds.remove(this.createGuild(club));
+                        this.client.unavailableClubs.remove(this.createClub(club));
                     }
                 });
 
@@ -1878,8 +1878,8 @@ class Shard extends EventEmitter {
                 */
                 this.emit("shardPreReady", this.id);
 
-                if(this.client.unavailableGuilds.size > 0 && packet.d.clubs.length > 0) {
-                    this.restartGuildCreateTimeout();
+                if(this.client.unavailableClubs.size > 0 && packet.d.clubs.length > 0) {
+                    this.restartClubCreateTimeout();
                 } else {
                     this.checkReady();
                 }
@@ -1949,7 +1949,7 @@ class Shard extends EventEmitter {
                 /**
                 * Fired when a club's emojis are updated
                 * @event Client#clubEmojisUpdate
-                * @prop {Guild} club The club
+                * @prop {Club} club The club
                 * @prop {Array} emojis The updated emojis of the club
                 * @prop {Array} oldEmojis The old emojis of the club
                 */
@@ -2012,7 +2012,7 @@ class Shard extends EventEmitter {
                 break;
             }
             case "USER_CLUB_SETTINGS_UPDATE": {
-                this.client.userGuildSettings[packet.d.club_id] = packet.d;
+                this.client.userClubSettings[packet.d.club_id] = packet.d;
                 break;
             }
             case "MESSAGE_ACK": // Ignore these
@@ -2168,7 +2168,7 @@ class Shard extends EventEmitter {
             "getAllUsersLength",
             "clubSyncQueue",
             "clubSyncQueueLength",
-            "unsyncedGuilds",
+            "unsyncedClubs",
             "lastHeartbeatAck",
             "seq",
             "sessionID",

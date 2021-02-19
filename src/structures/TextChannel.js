@@ -1,19 +1,19 @@
 "use strict";
 
 const Collection = require("../util/Collection");
-const GuildChannel = require("./ClubChannel");
+const ClubChannel = require("./ClubChannel");
 const Message = require("./Message");
 
 /**
-* Represents a club text channel. See GuildChannel for more properties and methods.
-* @extends GuildChannel
+* Represents a club text channel. See ClubChannel for more properties and methods.
+* @extends ClubChannel
 * @prop {String} lastMessageID The ID of the last message in this channel
 * @prop {Number} lastPinTimestamp The timestamp of the last pinned message
 * @prop {Collection<Message>} messages Collection of Messages in this channel
 * @prop {Number} rateLimitPerUser The ratelimit of the channel, in seconds. 0 means no ratelimit is enabled
 * @prop {String?} topic The topic of the channel
 */
-class TextChannel extends GuildChannel {
+class TextChannel extends ClubChannel {
     constructor(data, client, messageLimit) {
         super(data, client);
         this.messages = new Collection(Message, messageLimit == null ? client.options.messageLimit : messageLimit);

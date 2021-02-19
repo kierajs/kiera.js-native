@@ -21,7 +21,7 @@ const Base = require("./Base");
 * @prop {String} type The type of the integration
 * @prop {User} user The user connected to the integration
 */
-class GuildIntegration extends Base {
+class ClubIntegration extends Base {
     constructor(data, club) {
         super(data.id);
         this.club = club;
@@ -48,7 +48,7 @@ class GuildIntegration extends Base {
     * @returns {Promise}
     */
     delete() {
-        return this.club.shard.client.deleteGuildIntegration.call(this.club.shard.client, this.club.id, this.id);
+        return this.club.shard.client.deleteClubIntegration.call(this.club.shard.client, this.club.id, this.id);
     }
 
     /**
@@ -60,7 +60,7 @@ class GuildIntegration extends Base {
     * @returns {Promise}
     */
     edit(options) {
-        return this.club.shard.client.editGuildIntegration.call(this.club.shard.client, this.club.id, this.id, options);
+        return this.club.shard.client.editClubIntegration.call(this.club.shard.client, this.club.id, this.id, options);
     }
 
     /**
@@ -68,7 +68,7 @@ class GuildIntegration extends Base {
     * @returns {Promise}
     */
     sync() {
-        return this.club.shard.client.syncGuildIntegration.call(this.club.shard.client, this.club.id, this.id);
+        return this.club.shard.client.syncClubIntegration.call(this.club.shard.client, this.club.id, this.id);
     }
 
     toJSON(props = []) {
@@ -90,4 +90,4 @@ class GuildIntegration extends Base {
     }
 }
 
-module.exports = GuildIntegration;
+module.exports = ClubIntegration;
