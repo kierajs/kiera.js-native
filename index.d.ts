@@ -293,7 +293,7 @@ declare namespace Kiera {
   interface EmbedOptions {
     author?: EmbedAuthorOptions;
     color?: number;
-    description?: string;
+    content?: string;
     fields?: EmbedField[];
     footer?: EmbedFooterOptions;
     image?: EmbedImageOptions;
