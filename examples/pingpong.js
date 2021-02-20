@@ -1,6 +1,6 @@
 const kiera = require("kiera.js");
 
-const bot = new Eris("BOT_TOKEN");
+const bot = new Kiera("BOT_TOKEN");
 // Replace BOT_TOKEN with your bot account's token
 
 bot.on("ready", () => { // When the bot is ready

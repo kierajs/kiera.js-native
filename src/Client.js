@@ -48,7 +48,7 @@ try {
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
 /**
-* Represents the main Eris client
+* Represents the main Kiera client
 * @extends EventEmitter
 * @prop {Boolean?} bot Whether the bot user belongs to an OAuth2 application
 * @prop {Object} channelClubMap Object mapping channel IDs to club IDs
@@ -57,12 +57,12 @@ const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 * @prop {Collection<Club>} clubs Collection of clubs the bot is in
 * @prop {Object} clubShardMap Object mapping club IDs to shard IDs
 * @prop {Object} notes Object mapping user IDs to user notes (user accounts only)
-* @prop {Object} options Eris options
+* @prop {Object} options Kiera options
 * @prop {Object} privateChannelMap Object mapping user IDs to private channel IDs
 * @prop {Collection<PrivateChannel>} privateChannels Collection of private channels the bot is in
 * @prop {Collection<Relationship>} relationships Collection of relationships the bot user has (user accounts only)
 * @prop {RequestHandler} requestHandler The request handler the client will use
-* @prop {Collection<Shard>} shards Collection of shards Eris is using
+* @prop {Collection<Shard>} shards Collection of shards Kiera is using
 * @prop {Number} startTime Timestamp of bot ready event
 * @prop {String} token The bot user token
 * @prop {Collection<UnavailableClub>} unavailableClubs Collection of unavailable clubs the bot is in
@@ -77,18 +77,18 @@ class Client extends EventEmitter {
     /**
     * Create a Client
     * @arg {String} token bot token
-    * @arg {Object} [options] Eris options (all options are optional)
+    * @arg {Object} [options] Kiera options (all options are optional)
     * @arg {Object} [options.agent] A HTTP Agent used to proxy requests
     * @arg {Object} [options.allowedMentions] A list of mentions to allow by default in createMessage/editMessage
     * @arg {Boolean} [options.allowedMentions.everyone] Whether or not to allow @everyone/@here.
     * @arg {Boolean | Array<String>} [options.allowedMentions.roles] Whether or not to allow all role mentions, or an array of specific role mentions to allow.
     * @arg {Boolean | Array<String>} [options.allowedMentions.users] Whether or not to allow all user mentions, or an array of specific user mentions to allow.
-    * @arg {Boolean} [options.autoreconnect=true] Have Eris autoreconnect when connection is lost
+    * @arg {Boolean} [options.autoreconnect=true] Have Kiera autoreconnect when connection is lost
     * @arg {Boolean} [options.compress=false] Whether to request WebSocket data to be compressed or not
     * @arg {Number} [options.connectionTimeout=30000] How long in milliseconds to wait for the connection to handshake with the server
     * @arg {String} [options.defaultImageFormat="jpg"] The default format to provide user avatars, club icons, and group icons in. Can be "jpg", "png", "gif", or "webp"
     * @arg {Number} [options.defaultImageSize=128] The default size to return user avatars, club icons, banners, splashes, and group icons. Can be any power of two between 16 and 2048. If the height and width are different, the width will be the value specified, and the height relative to that
-    * @arg {Object} [options.disableEvents] If disableEvents[eventName] is true, the WS event will not be processed. This can cause significant performance increase on large bots. [A full list of the WS event names can be found on the docs reference page](/Eris/docs/reference#ws-event-names)
+    * @arg {Object} [options.disableEvents] If disableEvents[eventName] is true, the WS event will not be processed. This can cause significant performance increase on large bots. [A full list of the WS event names can be found on the docs reference page](/Kiera/docs/reference#ws-event-names)
     * @arg {Number} [options.firstShardID=0] The ID of the first shard to run for this client
     * @arg {Boolean} [options.getAllUsers=false] Get all the users in every club. Ready time will be severely delayed
     * @arg {Number} [options.clubCreateTimeout=2000] How long in milliseconds to wait for a CLUB_CREATE before "ready" is fired. Increase this value if you notice missing clubs
@@ -96,10 +96,10 @@ class Client extends EventEmitter {
     * @arg {Number | Array<String>} [options.intents] A list of intents, or raw bitmask value describing the intents to subscribe to. "presence" intent must be enabled on your application's page to be used.
     * @arg {Number} [options.largeThreshold=250] The maximum number of offline users per club during initial club data transmission
     * @arg {Number} [options.lastShardID=options.maxShards - 1] The ID of the last shard to run for this client
-    * @arg {Number} [options.latencyThreshold=30000] The average request latency at which Eris will start emitting latency errors
+    * @arg {Number} [options.latencyThreshold=30000] The average request latency at which Kiera will start emitting latency errors
     * @arg {Number} [options.maxReconnectAttempts=Infinity] The maximum amount of times that the client is allowed to try to reconnect to Helselia.
     * @arg {Number} [options.maxResumeAttempts=10] The maximum amount of times a shard can attempt to resume a session before considering that session invalid.
-    * @arg {Number | String} [options.maxShards=1] The total number of shards you want to run. If "auto" Eris will use Helselia's recommended shard count.
+    * @arg {Number | String} [options.maxShards=1] The total number of shards you want to run. If "auto" Kiera will use Helselia's recommended shard count.
     * @arg {Number} [options.messageLimit=100] The maximum size of a channel message cache
     * @arg {Boolean} [options.opusOnly=false] Whether to suppress the node-opus not found error or not
     * @arg {Number} [options.ratelimiterOffset=0] A number of milliseconds to offset the ratelimit timing calculations by
@@ -1621,7 +1621,7 @@ class Client extends EventEmitter {
     */
     getRESTChannel(channelID) {
         if(!this.options.restMode) {
-            return Promise.reject(new Error("Eris REST mode is not enabled"));
+            return Promise.reject(new Error("Kiera REST mode is not enabled"));
         }
         return this.requestHandler.request("GET", Endpoints.CHANNEL(channelID), true)
             .then((channel) => Channel.from(channel, this));
@@ -1635,7 +1635,7 @@ class Client extends EventEmitter {
     */
     getRESTClub(clubID, withCounts = false) {
         if(!this.options.restMode) {
-            return Promise.reject(new Error("Eris REST mode is not enabled"));
+            return Promise.reject(new Error("Kiera REST mode is not enabled"));
         }
         return this.requestHandler.request("GET", Endpoints.CLUB(clubID), true, {
             with_counts: withCounts
@@ -1649,7 +1649,7 @@ class Client extends EventEmitter {
     */
     getRESTClubChannels(clubID) {
         if(!this.options.restMode) {
-            return Promise.reject(new Error("Eris REST mode is not enabled"));
+            return Promise.reject(new Error("Kiera REST mode is not enabled"));
         }
         return this.requestHandler.request("GET", Endpoints.CLUB_CHANNELS(clubID), true)
             .then((channels) => channels.map((channel) => Channel.from(channel, this)));
@@ -1663,7 +1663,7 @@ class Client extends EventEmitter {
     */
     getRESTClubEmoji(clubID, emojiID) {
         if(!this.options.restMode) {
-            return Promise.reject(new Error("Eris REST mode is not enabled"));
+            return Promise.reject(new Error("Kiera REST mode is not enabled"));
         }
         return this.requestHandler.request("GET", Endpoints.CLUB_EMOJI(clubID, emojiID), true);
     }
@@ -1675,7 +1675,7 @@ class Client extends EventEmitter {
     */
     getRESTClubEmojis(clubID) {
         if(!this.options.restMode) {
-            return Promise.reject(new Error("Eris REST mode is not enabled"));
+            return Promise.reject(new Error("Kiera REST mode is not enabled"));
         }
         return this.requestHandler.request("GET", Endpoints.CLUB_EMOJIS(clubID), true);
     }
@@ -1688,7 +1688,7 @@ class Client extends EventEmitter {
     */
     getRESTClubMember(clubID, memberID) {
         if(!this.options.restMode) {
-            return Promise.reject(new Error("Eris REST mode is not enabled"));
+            return Promise.reject(new Error("Kiera REST mode is not enabled"));
         }
         return this.requestHandler.request("GET", Endpoints.CLUB_MEMBER(clubID, memberID), true).then((member) => new Member(member, this.clubs.get(clubID), this));
     }
@@ -1702,7 +1702,7 @@ class Client extends EventEmitter {
     */
     getRESTClubMembers(clubID, limit, after) {
         if(!this.options.restMode) {
-            return Promise.reject(new Error("Eris REST mode is not enabled"));
+            return Promise.reject(new Error("Kiera REST mode is not enabled"));
         }
         return this.requestHandler.request("GET", Endpoints.CLUB_MEMBERS(clubID), true, {
             limit,
@@ -1717,7 +1717,7 @@ class Client extends EventEmitter {
     */
     getRESTClubRoles(clubID) {
         if(!this.options.restMode) {
-            return Promise.reject(new Error("Eris REST mode is not enabled"));
+            return Promise.reject(new Error("Kiera REST mode is not enabled"));
         }
         return this.requestHandler.request("GET", Endpoints.CLUB_ROLES(clubID), true).then((roles) => roles.map((role) => new Role(role, null)));
     }
@@ -1731,7 +1731,7 @@ class Client extends EventEmitter {
     */
     getRESTClubs(limit, before, after) {
         if(!this.options.restMode) {
-            return Promise.reject(new Error("Eris REST mode is not enabled"));
+            return Promise.reject(new Error("Kiera REST mode is not enabled"));
         }
         return this.requestHandler.request("GET", Endpoints.USER_CLUBS("@me"), true, {
             limit,
@@ -1747,7 +1747,7 @@ class Client extends EventEmitter {
     */
     getRESTUser(userID) {
         if(!this.options.restMode) {
-            return Promise.reject(new Error("Eris REST mode is not enabled"));
+            return Promise.reject(new Error("Kiera REST mode is not enabled"));
         }
         return this.requestHandler.request("GET", Endpoints.USER(userID), true).then((user) => new User(user, this));
     }

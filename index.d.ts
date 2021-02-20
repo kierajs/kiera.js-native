@@ -4,9 +4,9 @@ import { Agent as HTTPSAgent } from "https";
 import { IncomingMessage, ClientRequest } from "http";
 import OpusScript = require("opusscript"); // Thanks TypeScript
 
-declare function Eris(token: string, options?: Eris.ClientOptions): Eris.Client;
+declare function Kiera(token: string, options?: Kiera.ClientOptions): Kiera.Client;
 
-declare namespace Eris {
+declare namespace Kiera {
   export const Constants: Constants;
   export const VERSION: string;
 
@@ -2328,4 +2328,4 @@ declare namespace Eris {
   }
 }
 
-export = Eris;
+export = Kiera;

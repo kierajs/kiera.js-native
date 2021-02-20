@@ -142,12 +142,12 @@ class Shard extends EventEmitter {
             try {
                 if(options.reconnect && this.sessionID) {
                     if(this.ws.readyState === WebSocket.OPEN) {
-                        this.ws.close(4901, "Reconnect: Eris");
+                        this.ws.close(4901, "Reconnect: Kiera");
                     } else {
                         this.ws.terminate();
                     }
                 } else {
-                    this.ws.close(1000, "Normal: Eris");
+                    this.ws.close(1000, "Normal: Kiera");
                 }
             } catch(err) {
                 this.emit("error", err, this.id);
