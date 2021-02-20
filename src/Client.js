@@ -1,3 +1,4 @@
+/* eslint-disable sort-class-members/sort-class-members */
 "use strict";
 
 const Base = require("./structures/Base");
@@ -341,7 +342,6 @@ class Client extends EventEmitter {
             if(!data.url.endsWith("/")) {
                 data.url += "/";
             }
-            
             this.gatewayURL = `${data.url}?v=${Constants.GATEWAY_VERSION}&encoding=${Erlpack ? "etf" : "json"}`;
 
             if(this.options.compress) {
