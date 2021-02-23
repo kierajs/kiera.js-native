@@ -1244,15 +1244,6 @@ class Shard extends EventEmitter {
                 break;
             }
             case "CLUB_DELETE": {
-                const voiceConnection = this.client.voiceConnections.get(packet.d.id);
-                if(voiceConnection) {
-                    if(voiceConnection.channelID) {
-                        this.client.leaveVoiceChannel(voiceConnection.channelID);
-                    } else {
-                        this.client.voiceConnections.leave(packet.d.id);
-                    }
-                }
-
                 delete this.client.clubShardMap[packet.d.id];
                 const club = this.client.clubs.remove(packet.d);
                 if(club) { // Helselia sends CLUB_DELETE for clubs that were previously unavailable in READY

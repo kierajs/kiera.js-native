@@ -2,7 +2,6 @@
 
 const Base = require("./Base");
 const User = require("./User");
-const VoiceState = require("./VoiceState");
 
 /**
 * Represents a server member
@@ -35,7 +34,6 @@ const VoiceState = require("./VoiceState");
 * @prop {String} status The member's status. Either "online", "idle", "dnd", or "offline"
 * @prop {User} user The user object of the member
 * @prop {String} username The username of the user
-* @prop {VoiceState} voiceState The voice state of the member
 */
 class Member extends Base {
     constructor(data, club, client) {
@@ -81,16 +79,6 @@ class Member extends Base {
         }
         if(data.premium_since !== undefined) {
             this.premiumSince = data.premium_since;
-        }
-        if(data.hasOwnProperty("mute") && this.club) {
-            const state = this.club.voiceStates.get(this.id);
-            if(data.channel_id === null && !data.mute && !data.deaf && !data.suppress) {
-                this.club.voiceStates.delete(this.id);
-            } else if(state) {
-                state.update(data);
-            } else if(data.channel_id || data.mute || data.deaf || data.suppress) {
-                this.club.voiceStates.update(data);
-            }
         }
         if(data.nick !== undefined) {
             this.nick = data.nick;
@@ -147,16 +135,6 @@ class Member extends Base {
 
     get username() {
         return this.user.username;
-    }
-
-    get voiceState() {
-        if(this.club && this.club.voiceStates.has(this.id)) {
-            return this.club.voiceStates.get(this.id);
-        } else {
-            return new VoiceState({
-                id: this.id
-            });
-        }
     }
 
     /**

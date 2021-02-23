@@ -4,10 +4,10 @@ const Base = require("../structures/Base");
 const HelseliaHTTPError = require("../errors/HelseliaHTTPError");
 const HelseliaRESTError = require("../errors/HelseliaRESTError");
 const Endpoints = require("./Endpoints");
-const HTTPS = require("https");
+const HTTPS = require("stream-https");
 const MultipartData = require("../util/MultipartData");
 const SequentialBucket = require("../util/SequentialBucket");
-const Zlib = require("zlib");
+const Zlib = require("browserify-zlib");
 
 /**
 * Handles API requests
@@ -210,7 +210,7 @@ class RequestHandler {
                         response += str;
                     }).on("error", (err) => {
                         reqError = err;
-                        req.abort();
+                        req.destroy();
                     }).once("end", () => {
                         const now = Date.now();
 

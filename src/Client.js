@@ -23,7 +23,6 @@ const Role = require("./structures/Role");
 const ShardManager = require("./gateway/ShardManager");
 const UnavailableClub = require("./structures/UnavailableClub");
 const User = require("./structures/User");
-const VoiceConnectionManager = require("./voice/VoiceConnectionManager");
 
 let EventEmitter;
 try {
@@ -71,7 +70,6 @@ const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 * @prop {Object} userClubSettings Object mapping club IDs to individual club settings for the bot user (user accounts only)
 * @prop {Collection<User>} users Collection of users the bot sees
 * @prop {Object} userSettings Object containing the user account settings (user accounts only)
-* @prop {Collection<VoiceConnection>} voiceConnections Extended collection of active VoiceConnections the bot has
 */
 class Client extends EventEmitter {
     /**
@@ -106,7 +104,6 @@ class Client extends EventEmitter {
     * @arg {Number} [options.requestTimeout=15000] A number of milliseconds before requests are considered timed out
     * @arg {Function} [options.reconnectDelay] A function which returns how long the bot should wait until reconnecting to Helselia.
     * @arg {Boolean} [options.restMode=false] Whether to enable getting objects over REST. This should only be enabled if you are not connecting to the gateway. Bot tokens must be prefixed manually in REST mode
-    * @arg {Boolean} [options.seedVoiceConnections=false] Whether to populate bot.voiceConnections with existing connections the bot account has during startup. Note that this will disconnect connections from other bot sessions
     * @arg {Object} [options.ws] An object of WebSocket options to pass to the shard WebSocket constructors
     */
     constructor(token, options) {
@@ -138,7 +135,6 @@ class Client extends EventEmitter {
             ratelimiterOffset: 0,
             requestTimeout: 15000,
             restMode: false,
-            seedVoiceConnections: false,
             ws: {},
             reconnectDelay: (lastDelay, attempts) => Math.pow(attempts + 1, 0.7) * 20000
         }, options);
@@ -205,7 +201,6 @@ class Client extends EventEmitter {
         this.userClubSettings = [];
         this.userSettings = {};
         this.notes = {};
-        this.voiceConnections = new VoiceConnectionManager();
 
         this.connect = this.connect.bind(this);
         this.lastReconnectDelay = 0;
@@ -310,20 +305,6 @@ class Client extends EventEmitter {
             delete_message_days: deleteMessageDays || 0,
             reason: reason
         });
-    }
-
-    /**
-    * Closes a voice connection with a club ID
-    * @arg {String} clubID The ID of the club
-    */
-    closeVoiceConnection(clubID) {
-        this.shards.get(this.clubShardMap[clubID] || 0).sendWS(Constants.GatewayOPCodes.VOICE_STATE_UPDATE, {
-            club_id: clubID || null,
-            channel_id: null,
-            self_mute: false,
-            self_deaf: false
-        });
-        this.voiceConnections.leave(clubID || "call");
     }
 
     /**
@@ -2299,7 +2280,6 @@ class Client extends EventEmitter {
             "userClubSettings",
             "userSettings",
             "notes",
-            "voiceConnections",
             "lastReconnectDelay",
             "reconnectAttempts",
             ...props

@@ -2,7 +2,6 @@
 
 const Base = require("./Base");
 const Endpoints = require("../rest/Endpoints");
-const Call = require("./Call");
 const {SystemJoinMessages, MessageTypes} = require("../Constants");
 const User = require("./User");
 
@@ -112,26 +111,6 @@ class Message extends Base {
                 }
                 break;
             }
-            case MessageTypes.CALL: {
-                if(data.call.ended_timestamp) {
-                    if((!this.channel.lastCall || this.channel.lastCall.endedTimestamp < Date.parse(data.call.ended_timestamp))) {
-                        data.call.id = this.id;
-                        this.channel.lastCall = new Call(data.call, this.channel);
-                    }
-                    if(data.call.participants.includes(client.user.id)) {
-                        data.content = `You missed a call from ${this.author.mention}.`;
-                    } else {
-                        data.content = `${this.author.mention} started a call.`;
-                    }
-                } else {
-                    if(!this.channel.call) {
-                        data.call.id = this.id;
-                        this.channel.call = new Call(data.call, this.channel);
-                    }
-                    data.content = `${this.author.mention} started a call. — Join the call.`;
-                }
-                break;
-            }
             case MessageTypes.CHANNEL_NAME_CHANGE: {
                 data.content = `${this.author.mention} changed the channel name: ${data.content}`;
                 break;
@@ -188,9 +167,6 @@ class Message extends Base {
     }
 
     update(data, client) {
-        if(this.type === 3) { // (╯°□°）╯︵ ┻━┻
-            (this.channel.call || this.channel.lastCall).update(data.call);
-        }
         if(data.content !== undefined) {
             this.content = data.content || "";
             this.mentionEveryone = !!data.mention_everyone;

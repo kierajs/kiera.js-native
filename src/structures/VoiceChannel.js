@@ -52,24 +52,6 @@ class VoiceChannel extends ClubChannel {
         return this.client.getChannelInvites.call(this.client, this.id);
     }
 
-    /**
-    * Joins the channel.
-    * @arg {Object} [options] VoiceConnection constructor options
-    * @arg {Object} [options.opusOnly] Skip opus encoder initialization. You should not enable this unless you know what you are doing
-    * @arg {Object} [options.shared] Whether the VoiceConnection will be part of a SharedStream or not
-    * @returns {Promise<VoiceConnection>} Resolves with a VoiceConnection
-    */
-    join(options) {
-        return this.client.joinVoiceChannel.call(this.client, this.id, options);
-    }
-
-    /**
-    * Leaves the channel.
-    */
-    leave() {
-        return this.client.leaveVoiceChannel.call(this.client, this.id);
-    }
-
     toJSON(props = []) {
         return super.toJSON([
             "bitrate",

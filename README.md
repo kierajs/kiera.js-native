@@ -1,3 +1,7 @@
-<img src="readmekiera.svg"> 
+# Kiera.js *Native Edition*
 
-**Developer's Note:** This is just a prototype. Yes, I used [abalabahaha/eris](https://github.com/abalabahaha/eris) for most, if not all, of this code - albeit modified for Helselia but it still deserves credit. 
+Simply put, this is [kiera.js](https://github.com/kierajs/kiera.js) but rewritten for react native...
+
+## How to use
+
+Easy peasy, just install it with `yarn` or `npm` and link to your react-native application if needed.

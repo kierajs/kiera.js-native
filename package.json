@@ -1,7 +1,7 @@
 {
-  "name": "kiera.js",
+  "name": "kiera.js-native",
   "version": "1.0.6",
-  "description": "**Developer's Note:** This is just a prototype. Yes, I used [abalabahaha/eris](https://github.com/abalabahaha/eris) for most, if not all, of this code - albeit modified for Helselia but it still deserves credit.",
+  "description": "Kiera.js for React Native",
   "main": "./index.js",
   "exports": {
     ".": [
@@ -14,7 +14,6 @@
     "./": "./",
     "./esm": "./esm.mjs"
   },
-  "typings": "./index.d.ts",
   "engines": {
     "node": ">=10.4.0"
   },
@@ -26,7 +25,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kiera.js/kiera.js.git"
+    "url": "git+https://github.com/kiera.js/kiera.js-native.git"
   },
   "keywords": [
     "api",
@@ -36,7 +35,9 @@
   "author": "Constanze",
   "license": "MIT",
   "dependencies": {
-    "ws": "^7.2.1"
+    "ws": "^7.2.1",
+    "stream-http": "3.1.1",
+    "browserify-zlib": "0.2.0"
   },
   "devDependencies": {
     "@types/node": "^8.10.63",
@@ -61,10 +62,7 @@
     "ws": false
   },
   "bugs": {
-    "url": "https://github.com/kiera.js/kiera.js/issues"
+    "url": "https://github.com/kiera.js/kiera.js-native/issues"
   },
-  "homepage": "https://github.com/kiera.js/kiera.js#readme",
-  "directories": {
-    "example": "examples"
-  }
+  "homepage": "https://github.com/kiera.js/kiera.js-native#readme"
 }
