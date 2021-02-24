@@ -2,7 +2,7 @@
 
 const Base = require("../structures/Base");
 const Bucket = require("../util/Bucket");
-const Call = require("../structures/Call");
+//const Call = require("../structures/Call");
 const Channel = require("../structures/Channel");
 const GroupChannel = require("../structures/GroupChannel");
 const ClubChannel = require("../structures/ClubChannel");
@@ -1561,82 +1561,6 @@ class Shard extends EventEmitter {
                 } else {
                     this.emit("warn", new Error("Unhandled CHANNEL_DELETE type: " + JSON.stringify(packet, null, 2)));
                 }
-                break;
-            }
-            case "CALL_CREATE": {
-                packet.d.id = packet.d.message_id;
-                const channel = this.client.getChannel(packet.d.channel_id);
-                if(channel.call) {
-                    channel.call.update(packet.d);
-                } else {
-                    channel.call = new Call(packet.d, channel);
-                    let incrementedID = "";
-                    let overflow = true;
-                    const chunks = packet.d.id.match(/\d{1,9}/g).map((chunk) => parseInt(chunk));
-                    for(let i = chunks.length - 1; i >= 0; --i) {
-                        if(overflow) {
-                            ++chunks[i];
-                            overflow = false;
-                        }
-                        if(chunks[i] > 999999999) {
-                            overflow = true;
-                            incrementedID = "000000000" + incrementedID;
-                        } else {
-                            incrementedID = chunks[i] + incrementedID;
-                        }
-                    }
-                    if(overflow) {
-                        incrementedID = overflow + incrementedID;
-                    }
-                    this.client.getMessages(channel.id, 1, incrementedID);
-                }
-                /**
-                * Fired when a call is created
-                * @event Client#callCreate
-                * @prop {Call} call The call
-                */
-                this.emit("callCreate", channel.call);
-                break;
-            }
-            case "CALL_UPDATE": {
-                const channel = this.client.getChannel(packet.d.channel_id);
-                if(!channel.call) {
-                    throw new Error("CALL_UPDATE but channel has no call");
-                }
-                const oldCall = {
-                    endedTimestamp: channel.call.endedTimestamp,
-                    participants: channel.call.participants,
-                    region: channel.call.region,
-                    ringing: channel.call.ringing,
-                    unavailable: channel.call.unavailable
-                };
-                /**
-                * Fired when a call is updated
-                * @event Client#callUpdate
-                * @prop {Call} call The updated call
-                * @prop {Object} oldCall The old call data
-                * @prop {Number?} oldCall.endedTimestamp The timestamp of the call end
-                * @prop {Array<String>} oldCall.participants The IDs of the call participants
-                * @prop {String?} oldCall.region The region of the call server
-                * @prop {Array<String>?} oldCall.ringing The IDs of people that were being rung
-                * @prop {Boolean} oldCall.unavailable Whether the call was unavailable or not
-                */
-                this.emit("callUpdate", channel.call.update(packet.d), oldCall);
-                break;
-            }
-            case "CALL_DELETE": {
-                const channel = this.client.getChannel(packet.d.channel_id);
-                if(!channel.call) {
-                    throw new Error("CALL_DELETE but channel has no call");
-                }
-                channel.lastCall = channel.call;
-                channel.call = null;
-                /**
-                * Fired when a call is deleted
-                * @event Client#callDelete
-                * @prop {Call} call The call
-                */
-                this.emit("callDelete", channel.lastCall);
                 break;
             }
             case "CHANNEL_RECIPIENT_ADD": {
