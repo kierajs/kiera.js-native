@@ -67,9 +67,9 @@
     "ws": false
   },
   "react-native": {
-    "https": "@tradle/react-native-http"
+    "https": "@tradle/react-native-http",
   	"stream": "readable-stream"
-	},
+  },
   "bugs": {
     "url": "https://github.com/kiera.js/kiera.js-native/issues"
   },
