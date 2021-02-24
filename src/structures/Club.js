@@ -7,7 +7,7 @@ const Collection = require("../util/Collection");
 const ClubChannel = require("./ClubChannel");
 const Member = require("./Member");
 const Role = require("./Role");
-const VoiceState = require("./VoiceState");
+//const VoiceState = require("./VoiceState");
 const Permission = require("./Permission");
 const {Permissions} = require("../Constants");
 
@@ -64,7 +64,7 @@ class Club extends Base {
         this.shard = client.shards.get(client.clubShardMap[this.id]);
         this.unavailable = !!data.unavailable;
         this.joinedAt = Date.parse(data.joined_at);
-        this.voiceStates = new Collection(VoiceState);
+        //this.voiceStates = new Collection(VoiceState);
         this.channels = new Collection(ClubChannel);
         this.members = new Collection(Member);
         this.memberCount = data.member_count;
@@ -122,27 +122,27 @@ class Club extends Base {
             }
         }
 
-        if(data.voice_states) {
-            if(!client.bot) {
-                this.pendingVoiceStates = data.voice_states;
-            } else {
-                for(const voiceState of data.voice_states) {
-                    if(!this.members.get(voiceState.user_id)) {
-                        continue;
-                    }
-                    voiceState.id = voiceState.user_id;
-                    try {
-                        this.channels.get(voiceState.channel_id).voiceMembers.add(this.members.update(voiceState));
-                    } catch(err) {
-                        client.emit("error", err, this.shard.id);
-                        continue;
-                    }
-                    if(client.options.seedVoiceConnections && voiceState.id === client.user.id && !client.voiceConnections.get(this.id)) {
-                        process.nextTick(() => this._client.joinVoiceChannel(voiceState.channel_id));
-                    }
-                }
-            }
-        }
+        //if(data.voice_states) {
+        //    if(!client.bot) {
+        //        this.pendingVoiceStates = data.voice_states;
+        //    } else {
+               // for(const voiceState of data.voice_states) {
+                   // if(!this.members.get(voiceState.user_id)) {
+                    //    continue;
+                   // }
+                    //voiceState.id = voiceState.user_id;
+                   // try {
+                   //     this.channels.get(voiceState.channel_id).voiceMembers.add(this.members.update(voiceState));
+                  //  } catch(err) {
+                       // client.emit("error", err, this.shard.id);
+                     //   continue;
+                   // }
+                 //   if(client.options.seedVoiceConnections && voiceState.id === client.user.id && !client.voiceConnections.get(this.id)) {
+               //         process.nextTick(() => this._client.joinVoiceChannel(voiceState.channel_id));
+             //       }
+           //     }
+         //   }
+        //}
         this.update(data);
     }
 
