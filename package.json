@@ -1,6 +1,6 @@
 {
   "name": "kiera.js-native",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Kiera.js for React Native",
   "main": "./index.js",
   "exports": {
@@ -35,9 +35,9 @@
   "author": "Constanze",
   "license": "MIT",
   "dependencies": {
+    "@tradle/react-native-http": "^2.0.1",
     "browserify-zlib": "0.2.0",
     "events": "^3.2.0",
-    "https-browserify": "^1.0.0",
     "util": "^0.12.3",
     "ws": "^7.2.1"
   },
@@ -62,6 +62,9 @@
     "tls": false,
     "tweetnacl": false,
     "ws": false
+  },
+  "react-native": {
+    "https": "@tradle/react-native-http"
   },
   "bugs": {
     "url": "https://github.com/kiera.js/kiera.js-native/issues"
