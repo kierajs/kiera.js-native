@@ -328,10 +328,10 @@ class RequestHandler {
                     });
                 });
 
-                req.setTimeout(this.requestTimeout, () => {
-                    reqError = new Error(`Request timed out (>${this.requestTimeout}ms) on ${method} ${url}`);
-                    req.abort();
-                });
+                // req.setTimeout(this.requestTimeout, () => {
+                  // reqError = new Error(`Request timed out (>${this.requestTimeout}ms) on ${method} ${url}`);
+                  //  req.abort();
+                // });
 
                 if(Array.isArray(data)) {
                     for(const chunk of data) {

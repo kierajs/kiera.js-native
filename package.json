@@ -1,6 +1,6 @@
 {
   "name": "kiera.js-native",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Kiera.js for React Native",
   "main": "./index.js",
   "exports": {
