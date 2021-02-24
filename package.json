@@ -1,6 +1,6 @@
 {
   "name": "kiera.js-native",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Kiera.js for React Native",
   "main": "./index.js",
   "exports": {
@@ -37,7 +37,7 @@
   "dependencies": {
     "browserify-zlib": "0.2.0",
     "events": "^3.2.0",
-    "stream-http": "3.1.1",
+    "https-browserify": "^1.0.0",
     "util": "^0.12.3",
     "ws": "^7.2.1"
   },
