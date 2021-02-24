@@ -57,9 +57,12 @@ class RequestHandler {
     request(method, url, auth, body, file, _route, short) {
         const route = _route || this.routefy(url, method);
 
-        const _stackHolder = {}; // Preserve async stack
-        Error.captureStackTrace(_stackHolder);
-
+        let _stackHolder = {}; // Preserve async stack
+        if(!!Error.captureStackTrace) {
+					Error.captureStackTrace(_stackHolder);
+				} else {
+					_stackHolder.stack = new Error().stack;
+				}
         return new Promise((resolve, reject) => {
             let attempts = 0;
 
