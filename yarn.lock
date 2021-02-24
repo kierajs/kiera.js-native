@@ -23,10 +23,10 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@tradle/react-native-http@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@tradle/react-native-http/-/react-native-http-2.0.1.tgz#af19e240e1e580bfa249563924d1be472686f48b"
-  integrity sha1-rxniQOHlgL+iSVY5JNG+RyaG9Is=
+"@kierajs/react-native-http@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@kierajs/react-native-http/-/react-native-http-2.0.3.tgz#e7801d315ad0e20c017a7f5098d43631f8914d5b"
+  integrity sha512-ii6wJ0+VOkK7L6W5lpRyXL+yfGmEPL0gdTC+ZUOnT9llxbEcwYL2pOCatxd1ccQYe1PfjkKF7OVjdMHNrO/Mzg==
   dependencies:
     Base64 "~0.2.0"
     inherits "~2.0.1"
