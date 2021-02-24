@@ -8,7 +8,7 @@ function Kiera(token, options) {
 
 Kiera.Base = require("./src/structures/Base");
 Kiera.Bucket = require("./src/util/Bucket");
-Kiera.Call = require("./src/structures/Call");
+//Kiera.Call = require("./src/structures/Call");
 Kiera.CategoryChannel = require("./src/structures/CategoryChannel");
 Kiera.Channel = require("./src/structures/Channel");
 Kiera.Client = Client;
@@ -36,15 +36,15 @@ Kiera.RequestHandler = require("./src/rest/RequestHandler");
 Kiera.Role = require("./src/structures/Role");
 Kiera.SequentialBucket = require("./src/util/SequentialBucket");
 Kiera.Shard = require("./src/gateway/Shard");
-Kiera.SharedStream = require("./src/voice/SharedStream");
+//Kiera.SharedStream = require("./src/voice/SharedStream");
 Kiera.StoreChannel = require("./src/structures/StoreChannel");
 Kiera.TextChannel = require("./src/structures/TextChannel");
 Kiera.UnavailableClub = require("./src/structures/UnavailableClub");
 Kiera.User = require("./src/structures/User");
 Kiera.VERSION = require("./package.json").version;
-Kiera.VoiceChannel = require("./src/structures/VoiceChannel");
-Kiera.VoiceConnection = require("./src/voice/VoiceConnection");
-Kiera.VoiceConnectionManager = require("./src/voice/VoiceConnectionManager");
-Kiera.VoiceState = require("./src/structures/VoiceState");
+//Kiera.VoiceChannel = require("./src/structures/VoiceChannel");
+//Kiera.VoiceConnection = require("./src/voice/VoiceConnection");
+//Kiera.VoiceConnectionManager = require("./src/voice/VoiceConnectionManager");
+//Kiera.VoiceState = require("./src/structures/VoiceState");
 
 module.exports = Kiera;
