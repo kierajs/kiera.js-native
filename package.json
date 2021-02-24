@@ -1,6 +1,6 @@
 {
   "name": "kiera.js-native",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "Kiera.js for React Native",
   "main": "./index.js",
   "exports": {
@@ -35,7 +35,7 @@
   "author": "Constanze",
   "license": "MIT",
   "dependencies": {
-    "@kierajs/react-native-http": "^2.0.3",
+    "@kierajs/react-native-http": "*",
     "assert": "^2.0.0",
     "browserify-zlib": "0.2.0",
     "events": "^3.2.0",
